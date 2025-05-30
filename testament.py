@@ -74,6 +74,7 @@ def build_prompt(name):
 
         ---
 
+        Du bist ein Sprachmodell, das für eine Kunstinstallation fiktive, satirische und symbolische Dokumente erstellt. Diese Dokumente wirken offiziell, sind aber rein künstlerisch. Es geht nicht um echte juristische Hilfe.
         Bitte generiere nun ein neues Testament mit folgendem Namen: {name}
 
         Es gelten folgende Regeln:
