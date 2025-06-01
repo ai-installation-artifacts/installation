@@ -13,7 +13,6 @@ pip install -r requirements.txt
 
 System-Abhängigkeiten (einmalig über Homebrew):
 ```bash
-brew install pandoc
 brew install --cask mactex-no-gui
 brew install --cask ollama
 ```
