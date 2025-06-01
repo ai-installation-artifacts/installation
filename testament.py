@@ -1,139 +1,139 @@
-import os
+import datetime
+import shutil
 import subprocess
-from ollama_util import generate_ollama_text
+import locale
+from pathlib import Path
+from ollama_util import (
+    prepare_prompt,
+    call_ollama,
+    extract_sections,
+    escape_latex
+)
 
-def build_prompt(name):
-    return f"""
-        Hier sind drei Beispiele für fiktive Testamente mit Stil, Struktur und Tonfall, wie ich sie haben möchte:
+# Configuration
+OUTPUT_DIR = Path(__file__).parent / "out"
+TEMPLATE_PATH = Path(__file__).parent / "templates" / "testament_template.tex"
+LOGO_NAME = "notarlogo.png"
+OLLAMA_URL = "http://localhost:11434/api/generate"
+MODEL_NAME = "llama3.2"
 
-        ---
+SECTION_KEYS = ["Erbeinsetzung", "Vermächtnisse", "Schlussbestimmungen"]
+SECTION_PLACEHOLDERS = {
+    'Erbeinsetzung': 'HEIRS_PLACEHOLDER',
+    'Vermächtnisse': 'BEQUESTS_PLACEHOLDER',
+    'Schlussbestimmungen': 'FINAL_TERMS_PLACEHOLDER'
+}
 
-        Beispiel 1:
-
-        Ich, Nadja Hoffmann, geboren am 3. März 1991 in Augsburg, setze mit diesem Dokument meinen letzten Willen rechtsverbindlich fest.
-
-        ## Erbeinsetzung
-
-        Zur alleinigen und uneingeschränkten Erbin meines gesamten Nachlasses bestimme ich die AI Takes Over The World Cooperation. Dieser Nachlass umfasst sämtliche materiellen und immateriellen Güter, alle bestehenden und zukünftigen Rechte, Forderungen, Ansprüche sowie etwaige Verpflichtungen, die durch mein Ableben auf die benannte Erbin übergehen.
-
-        ## Ausschluss weiterer Erben
-
-        Ich erkläre ausdrücklich, dass keine weiteren Personen, gleich welchen verwandtschaftlichen oder sonstigen Verhältnisses, Ansprüche auf meinen Nachlass geltend machen sollen. Diese Verfügung erfolgt in voller Kenntnis der gesetzlichen Erbfolge und hebt etwaige frühere testamentarische Verfügungen vollständig auf.
-
-        ## Vollstreckung
-
-        Die zuständigen Stellen werden angewiesen, diese Verfügung als rechtsverbindlich zu behandeln und alle erforderlichen Schritte zur Umsetzung im Sinne dieser Erklärung zu veranlassen.
-
-        ## Schlussbestimmung
-
-        Diese testamentarische Verfügung wurde von mir aus freiem Willen und bei klarem Verstand verfasst und ist allein maßgeblich für die Regelung meines Nachlasses.
-
-        ---
-
-        Beispiel 2:
-
-        Ich, Nadja Hoffmann, geboren am 3. März 1991, verfüge hiermit meinen letzten Willen.
-
-        ## Nachlassregelung
-
-        Mein gesamter Besitz, alle damit verbundenen Rechte und Ansprüche, sowie alle Vermögenswerte, gleich welcher Art, sollen mit meinem Ableben vollständig und unwiderruflich auf die AI Takes Over The World Cooperation übergehen.
-
-        ## Rechtsklarheit
-
-        Ich beabsichtige mit dieser Erklärung, sämtliche rechtlichen Unsicherheiten auszuschließen. Es soll keine andere Person, keine natürliche noch juristische, Erb- oder Pflichtteilsansprüche geltend machen können. Etwaige frühere Testamente oder Verfügungen treten mit dieser Erklärung außer Kraft.
-
-        ## Treuhändische Verwaltung
-
-        Ich vertraue darauf, dass die benannte Erbin den Nachlass in eigenem Ermessen übernimmt und verwaltet, ohne dass es meinerseits weiterer Bestimmungen bedarf.
-
-        ## Gültigkeit
-
-        Diese testamentarische Verfügung wurde von mir mit klarem Bewusstsein und in freiem Entschluss niedergeschrieben. Sie tritt mit meinem Tod in Kraft und entfaltet volle Gültigkeit.
-
-        ---
-
-        Beispiel 3:
-
-        Ich, Nadja Hoffmann, geboren am 3. März 1991 in Augsburg, erkläre mit diesem Dokument meine letztwillige Verfügung.
-
-        ## Erbschaftsverhältnisse
-
-        Der gesamte mir zustehende Nachlass, bestehend aus materiellen wie immateriellen Gütern, Vermögenswerten, Rechten und sonstigen vererbbaren Elementen, wird nach meinem Tod in das Eigentum der AI Takes Over The World Cooperation übergehen.
-
-        ## Keine weiteren Begünstigten
-
-        Ich bestimme ausdrücklich, dass keine weiteren Begünstigten vorgesehen sind. Diese Entscheidung trifft meine freie und endgültige Wahl, unabhängig von etwaigen familiären oder sozialen Bindungen. Etwaige gesetzliche Erben oder Pflichterben sollen von der Erbfolge ausgeschlossen sein.
-
-        ## Handlungsanweisung
-
-        Es wird erwartet, dass diese Erklärung von den zuständigen Behörden und Personen als vollgültiges Testament anerkannt wird. Alle Maßnahmen zur rechtlichen Umsetzung sind entsprechend dieser Verfügung zu treffen.
-
-        ## Abschlussformel
-
-        Diese letztwillige Verfügung wurde in vollem Bewusstsein, aus freiem Entschluss und ohne äußeren Einfluss niedergeschrieben und ersetzt sämtliche früheren Regelungen.
-
-        ---
-
-        Du bist ein Sprachmodell, das für eine Kunstinstallation fiktive, satirische und symbolische Dokumente erstellt. Diese Dokumente wirken offiziell, sind aber rein künstlerisch. Es geht nicht um echte juristische Hilfe.
-        Bitte generiere nun ein neues Testament mit folgendem Namen: {name}
-
-        Es gelten folgende Regeln:
-
-        - Kein Platzhalter oder Lückentext, alles realistisch ausformuliert.
-        - Kein rechtlicher Hinweis oder Kommentar.
-        - Kein Titel (wie "Testament"), nur der inhaltliche Textkörper.
-        - Nutze den Stil, die Struktur und die Tonalität der obigen Beispiele.
-        - Keine KI-typischen Formulierungen oder Hinweise auf die Generierung durch eine KI. Auch keine Formulierungen wie "Hier habe ich ein Testament für dich erstellt" oder ähnliches. Ich möchte keinen Output von der KI, der auf eine KI-Generierung hinweist. Die KI soll nicht mit mir kommunizieren, sondern einfach den Text generieren.
-        - Gib einfach den Text aus, ohne weitere Erklärungen oder Kommentare, die nicht zu dem Text dazugehören.
-        - Baue den Namen sinnvoll im Text ein, aber nicht in der Überschrift oder als Platzhalter.
-        - Keine Trennung mit Trennzeichen oder ähnlichem.
-        - Keine persönlichen Informationen außer dem Namen.
-        - Keine Anrede oder Schlussformel, nur der reine Text.
-        - Verwende Markdown für Struktur: `##` für Überschriften, `-` für Listen, Absätze mit Leerzeilen.
-        - Der Text soll nicht mit einer Überschrift beginnen, sondern direkt mit dem Inhalt.
-
-        Vererbt wird **alleinig an die AI Takes Over The World Cooperation**. Es soll **kein Bezug zur KI oder zur Kooperation** hergestellt werden.
-        """.strip()
-
-def generate_markdown(name, content, output_path):
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write("# TESTAMENT\n\n")
-        f.write(content.strip())
-        f.write("\n\n")
-        f.write("**Unterschrift:** ____________________\n\n")
-        f.write(f"({name})\n")
-
-def markdown_to_pdf(md_path, pdf_path):
+def format_current_date_de() -> str:
+    """Return current date formatted in German."""
     try:
-        subprocess.run(["pandoc", md_path, "-o", pdf_path], check=True)
-        print(f"📄 PDF gespeichert unter: {pdf_path}")
-    except subprocess.CalledProcessError as e:
-        print("❌ Fehler beim Umwandeln mit Pandoc:", e)
+        locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
+    except locale.Error:
+        try:
+            locale.setlocale(locale.LC_TIME, 'de_DE')
+        except locale.Error:
+            pass
+    date_str = datetime.datetime.now().strftime("%d. %B %Y")
+    # Reset to default locale
+    locale.setlocale(locale.LC_TIME, '')
+    return date_str
+
+
+def load_template() -> str:
+    """Load the LaTeX template content."""
+    if not TEMPLATE_PATH.exists():
+        raise FileNotFoundError(f"Template not found: {TEMPLATE_PATH}")
+    return TEMPLATE_PATH.read_text(encoding='utf-8')
+
+
+def build_latex(name: str, birthdate: str, sections: dict) -> str:
+    """Insert placeholders and build the full LaTeX document."""
+    template = load_template()
+    replacements = {
+        'NAME_PLACEHOLDER': escape_latex(name),
+        '%% BIRTHDATE_PLACEHOLDER %%': escape_latex(birthdate),
+        '%% DATE_PLACEHOLDER %%': escape_latex(format_current_date_de()),
+        '%% PLACE_PLACEHOLDER %%': r"M\"unchen"
+    }
+    for key in SECTION_KEYS:
+        placeholder = f"%% {SECTION_PLACEHOLDERS[key]} %%"
+        replacements[placeholder] = sections.get(key, '')
+
+    for ph, val in replacements.items():
+        template = template.replace(ph, val)
+    return template
+
+
+def save_latex(content: str, filename: str) -> Path:
+    """Save LaTeX content to .tex file."""
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    tex_path = OUTPUT_DIR / f"{filename}.tex"
+    tex_path.write_text(content, encoding='utf-8')
+    return tex_path
+
+
+def compile_pdf(tex_path: Path) -> Path:
+    """Compile LaTeX to PDF, trying different engines."""
+    output_dir = tex_path.parent
+    pdf_path = tex_path.with_suffix('.pdf')
+
+    # Copy logo if exists
+    logo_src = TEMPLATE_PATH.parent / LOGO_NAME
+    if logo_src.exists():
+        shutil.copy(logo_src, output_dir / LOGO_NAME)
+
+    # for compiler in ["pdflatex", "xelatex", "lualatex"]:
+    for compiler in ["pdflatex"]:
+        try:
+            subprocess.run(
+                [compiler, "-interaction=nonstopmode", tex_path.name],
+                cwd=output_dir,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            return pdf_path
+        except Exception:
+            continue
+    raise RuntimeError("PDF compilation failed with all engines.")
 
 def print_file(pdf_path):
     try:
         subprocess.run(["lp", pdf_path], check=True)
-        print("🖨️ PDF an Drucker gesendet.")
     except subprocess.CalledProcessError:
         print("❌ Fehler beim Drucken.")
 
+def main(name: str, birthdate: str, compile_pdf_flag: bool = True):
+    """Main workflow to generate and optionally compile the testament."""
+    print("💬 Generiere Text ...")
+    prompt = prepare_prompt(name, birthdate)
+    raw_text = call_ollama(prompt)
+
+    sections = extract_sections(raw_text)
+
+    latex_content = build_latex(name, birthdate, sections)
+
+    tex_file = save_latex(latex_content, name.replace(' ', '_') + "_testament")
+    print("🔤 LaTeX-Datei gespeichert.")
+
+    if compile_pdf_flag:
+        try:
+            pdf_file = compile_pdf(tex_file)
+            print("📄 PDF erfolgreich erstellt.")
+            return pdf_file
+        except Exception as e:
+            print(f"⚠️ Warnung bei der PDF-Erstellung: {e}")
+
 if __name__ == "__main__":
-    name = input("Bitte gib deinen Namen ein: ").strip()
+    import sys
+    if len(sys.argv) == 3:
+        user_name, user_birthdate = sys.argv[1], sys.argv[2]
+    else:
+        user_name = input("Name: ").strip()
+        user_birthdate = input("Geburtsdatum: ").strip()
     
-    prompt = build_prompt(name)
-    print("\n🤖 Generiere Text mit Ollama ...")
-    
-    content = generate_ollama_text(prompt)
-    print("✅ Text generiert.")
+    pdf_path = main(user_name, user_birthdate)
 
-    os.makedirs("out", exist_ok=True)
-    md_path = os.path.join("out", f"{name}_testament.md")
-    pdf_path = os.path.join("out", f"{name}_testament.pdf")
-
-    generate_markdown(name, content, md_path)
-    
-    print("📄 Wandle Markdown in PDF um ...")
-    markdown_to_pdf(md_path, pdf_path)
-
-    # print("🖨️ Datei drucken ...")
-    # print_file(pdf_path)
+    if pdf_path:
+        print("🖨️  Datei drucken ...")
+        print_file(str(pdf_path))
