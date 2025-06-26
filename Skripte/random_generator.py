@@ -16,6 +16,7 @@ KUENDIGUNG_PATH = project_root / "Skripte" / "Kuendigung" / "kuendigung.py"
 TESTAMENT_PATH = project_root / "Skripte" / "Testament" / "testament.py"
 PATIENTENVERFUEGUNG_PATH = project_root / "Skripte" / "Patientenverfuegung" / "patientenverfuegung.py"
 VOLLMACHT_PATH = project_root / "Skripte" / "Vollmacht" / "vollmacht.py"
+RECHNUNG_PATH = project_root / "Skripte" / "Rechnung" / "rechnung.py"
 
 # Temporäre Datei für die Zwischenspeicherung der Eingabedaten
 TEMP_DATA_FILE = project_root / "temp_user_data.json"
@@ -138,6 +139,11 @@ def run_vollmacht(name, birthdate):
     print("\n=== Generiere Vollmacht ===")
     return run_script_in_subprocess(VOLLMACHT_PATH, name, birthdate, script_type="vollmacht")
 
+def run_rechnung(name, birthdate):
+    """Führt das Rechnungsskript aus."""
+    print("\n=== Generiere Rechnung ===")
+    return run_script_in_subprocess(RECHNUNG_PATH, name, birthdate, script_type="vollmacht")
+
 def cleanup():
     """Löscht die temporären Daten."""
     if TEMP_DATA_FILE.exists():
@@ -156,7 +162,8 @@ def main():
             ("Kündigung", run_kuendigung),
             ("Testament", run_testament),
             ("Patientenverfügung", run_patientenverfuegung),
-            ("Vollmacht", run_vollmacht)
+            ("Vollmacht", run_vollmacht),
+            ("Rechnung", run_rechnung)
         ]
         
         selected_scripts = random.sample(available_scripts, 2)

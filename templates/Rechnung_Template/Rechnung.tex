@@ -1,0 +1,105 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+% Footer einrichten ohne Header
+\pagestyle{fancy}
+\fancyhf{} % Alle Header- und Footer-Felder leeren
+\renewcommand{\headrulewidth}{0pt} % Keine Linie im Header
+\renewcommand{\footrulewidth}{0pt} % Keine Linie im Footer
+
+% Footer-Text mit angepasster Breite
+\fancyfoot[C]{\vspace{0.3cm}\begin{minipage}{0.9\textwidth}\centering\textcolor{gray}{\scriptsize 
+AI Takes Over The World Cooperation • Innovations Allee 10 • 80331 München \\
+Amtsgericht München HRB 72284 • USt-ID DE983469123 • www.aitakesover.org
+}\end{minipage}}
+
+% Seitenränder
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+% Schrift & Zeilenabstand
+\renewcommand{\arraystretch}{1.3}
+
+\begin{document}
+
+% Logo und Absender
+\noindent
+\begin{minipage}{0.7\textwidth}
+    \textbf{\Large AI Takes Over The World Cooperation} \\
+    Innovations Allee 10 \\
+    80331 München \\
+    E-Mail: billing@aitow.org \\
+    USt-IdNr: DE983469123
+\end{minipage}
+\begin{minipage}{0.3\textwidth}
+    \flushright
+    \includegraphics[width=4cm]{aitow-logo.png} % Logo falls vorhanden
+    \vspace{0.5cm}
+\end{minipage}
+
+\vspace{1cm}
+
+% Empfänger
+\noindent
+\textbf{Rechnung an:} \\
+NAME_PLACEHOLDER \\
+STREET_PLACEHOLDER \\
+ZIP_PLACEHOLDER
+
+\vspace{1cm}
+
+% Rechnungskopf
+\noindent
+\textbf{\LARGE RECHNUNG} \\[0.5cm]
+\begin{tabular}{@{}ll}
+Rechnungsnummer: & AIT-DATE_PLACEHOLDER \\
+Rechnungsdatum: & DATE_PLACEHOLDER \\
+Zahlungsziel:   & 14 Tage (bis DUE_DATE_PLACEHOLDER) \\
+\end{tabular}
+
+\vspace{1cm}
+
+% Leistungstabelle
+\begin{longtable}{|p{8cm}|r|r|}
+\hline
+\textbf{Leistung} & \textbf{Menge} & \textbf{Gesamt (EUR)} \\
+\hline
+LEISTUNG1_PLACEHOLDER & MENGE1_PLACEHOLDER & PREIS1_PLACEHOLDER \\
+LEISTUNG2_PLACEHOLDER & MENGE2_PLACEHOLDER & PREIS2_PLACEHOLDER \\
+LEISTUNG3_PLACEHOLDER & MENGE3_PLACEHOLDER & PREIS3_PLACEHOLDER \\
+LEISTUNG4_PLACEHOLDER & MENGE4_PLACEHOLDER & PREIS4_PLACEHOLDER \\
+LEISTUNG5_PLACEHOLDER & MENGE5_PLACEHOLDER & PREIS5_PLACEHOLDER \\
+\hline
+\multicolumn{2}{|r|}{\textbf{Zwischensumme}} & ZWISCHENSUMME_PLACEHOLDER \\
+\multicolumn{2}{|r|}{zzgl. 19\,\% MwSt.} & MWST_PLACEHOLDER \\
+\hline
+\multicolumn{2}{|r|}{\textbf{Gesamtbetrag}} & \textbf{GESAMTBETRAG_PLACEHOLDER} \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+\noindent
+Bitte überweisen Sie den Gesamtbetrag unter Angabe der Rechnungsnummer auf folgendes Konto:
+
+\vspace{0.3cm}
+\begin{tabular}{ll}
+Bank: & AI Global Bank \\
+IBAN: & DE89 3704 0044 0532 0130 00 \\
+BIC: & AIGLDEFFXXX \\
+Verwendungszweck: & AIT-DATE_PLACEHOLDER – NAME_PLACEHOLDER
+\end{tabular}
+
+% Footer wird durch fancyhdr gesetzt
+
+\end{document}
