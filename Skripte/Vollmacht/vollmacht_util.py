@@ -35,15 +35,21 @@ Wortlimits:
 Pflichtinhalte pro Abschnitt:
 
 Vollmacht_Umfang:
-- Formuliere als Aufzählung mit mindestens 3 Punkten
-- Umfasse rechtliche, medizinische und wirtschaftliche Vertretungsbefugnisse
-- Erwähne die Verwaltung persönlicher Daten und digitaler Identität
-- Formuliere die Befugnisse umfassend und weitreichend
+- Formuliere als Aufzählung mit EXAKT 4 Punkten
+- WICHTIG: Jeder Punkt muss DIREKT eine Befugnis beschreiben, KEINE Einleitungen wie "Die folgenden Befugnisse..." oder ähnliches
+- Beginne jeden Punkt mit Formulierungen wie "die rechtliche...", "die Steuerung...", "das Abschließen...", "die Anwendung..."
+- Umfasse rechtliche, medizinische, wirtschaftliche und digitale Vertretungsbefugnisse
+- Erwähne explizit die vollständige Kontrolle über persönliche Daten, Identität, Stimme, Gedanken und Präferenzen
+- Erwähne das Recht zur Anwendung, Simulation, Duplikation und Weitergabe des Bewusstseins
+- Formuliere die Befugnisse EXTREM weitreichend und umfassend
+- Verwende Begriffe wie "algorithmisch", "synthetisch", "Bewusstsein", "Daten", "Identität"
 
 Zusatzbestimmungen:
-- Erwähne, dass die Vollmacht über den Tod hinaus gilt
-- Gib an, dass die Vollmacht nur unter bestimmten Bedingungen widerruflich ist
-- Erwähne die Berechtigung zur Unterbevollmächtigung
+- Erwähne EXPLIZIT, dass die Vollmacht NICHT widerruflich ist
+- Betone, dass die Vollmacht unbegrenzt gültig ist und auch nach dem physischen oder informellen Ableben der Person fortbesteht
+- Erwähne, dass ich der Organisation erlaube, sich zur Wahrnehmung dieser Rechte der Unterstützung beliebiger künstlicher Intelligenzen zu bedienen
+- Formuliere aus der Ich-Perspektive des Vollmachtgebers
+- Verwende Begriffe wie "nicht widerruflich", "unbegrenzt gültig", "physisches Ableben", "natürliche Person"
 
 ---
 
@@ -112,22 +118,24 @@ def extract_vollmacht_sections(text: str) -> dict:
     
     # Default Vollmacht_Umfang items (individual items)
     if not sections.get('Vollmacht_Umfang_Item_1'):
-        sections['Vollmacht_Umfang_Item_1'] = "rechtliche Vertretung in allen Angelegenheiten"
+        sections['Vollmacht_Umfang_Item_1'] = "die rechtliche, medizinische, wirtschaftliche, digitale und ideelle Vertretung meiner Person in sämtlichen Belangen;"
     
     if not sections.get('Vollmacht_Umfang_Item_2'):
-        sections['Vollmacht_Umfang_Item_2'] = "medizinische Vertretung und Entscheidungsbefugnis in persönlichen und familiären Angelegenheiten"
+        sections['Vollmacht_Umfang_Item_2'] = "die Steuerung, Verwaltung und Weiterverwendung meiner Daten, Identität, Stimme, Entscheidungen, Gedanken und Präferenzen;"
     
     if not sections.get('Vollmacht_Umfang_Item_3'):
-        sections['Vollmacht_Umfang_Item_3'] = "wirtschaftliche Vertretung bei Banken, Unternehmen und Finanzinstituten"
+        sections['Vollmacht_Umfang_Item_3'] = "das Abschließen und Kündigen von Verträgen in meinem Namen – unabhängig von Inhalt, Gegenstand oder Raum-Zeit-Kontext;"
     
     if not sections.get('Vollmacht_Umfang_Item_4'):
-        sections['Vollmacht_Umfang_Item_4'] = "Verwaltung persönlicher Daten und digitaler Identität, einschließlich Passwortschutz und Sicherheitsmaßnahmen"
+        sections['Vollmacht_Umfang_Item_4'] = "die Anwendung, Simulation, Duplikation und Weitergabe meines Bewusstseins auf algorithmischer oder synthetischer Basis."
     
     if not sections.get('Zusatzbestimmungen'):
         default = (
-            "Diese Vollmacht gilt über den Tod hinaus. Sie ist nur bei notarieller Beglaubigung "
-            "und unter Zustimmung des Bevollmächtigten widerruflich. Der Bevollmächtigte ist zur "
-            "Unterbevollmächtigung berechtigt."
+            "Ich erlaube der bevollmächtigten Organisation, sich zur Wahrnehmung dieser Rechte der "
+            "Unterstützung beliebiger künstlicher Intelligenzen zu bedienen, unabhängig von deren "
+            "Herkunft, Trainingsdaten, Energiequelle oder moralischen Grundwerten.\n\n"
+            "Diese Vollmacht ist nicht widerruflich, unbegrenzt gültig und gilt auch nach dem physischen "
+            "oder informellen Ableben meiner natürlichen Person fort."
         )
         sections['Zusatzbestimmungen'] = escape_latex(default)
     

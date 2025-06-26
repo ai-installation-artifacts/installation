@@ -15,6 +15,7 @@ sys.path.insert(0, str(project_root))
 KUENDIGUNG_PATH = project_root / "Skripte" / "Kuendigung" / "kuendigung.py"
 TESTAMENT_PATH = project_root / "Skripte" / "Testament" / "testament.py"
 PATIENTENVERFUEGUNG_PATH = project_root / "Skripte" / "Patientenverfuegung" / "patientenverfuegung.py"
+VOLLMACHT_PATH = project_root / "Skripte" / "Vollmacht" / "vollmacht.py"
 
 # Temporäre Datei für die Zwischenspeicherung der Eingabedaten
 TEMP_DATA_FILE = project_root / "temp_user_data.json"
@@ -48,9 +49,11 @@ def run_script_in_subprocess(script_path, name, birthdate, script_type=None):
         script_dir = script_path.parent
         
         # Bereite die Kommandozeile basierend auf dem Skripttyp vor
-        if script_type == "kuendigung":
-            # Kündigungsskript verwendet argparse mit benannten Argumenten und interaktiver Eingabe
-            cmd = [sys.executable, str(script_path), "--no_print"]
+        if script_type in ["kuendigung", "vollmacht"]:
+            # Kündigungs- und Vollmachtsskript verwenden interaktive Eingabe
+            cmd = [sys.executable, str(script_path)]
+            if script_type == "kuendigung":
+                cmd.append("--no_print")  # Nur für Kündigung
             # Wir werden input() mit einem Pipe-Trick überschreiben
             input_data = f"{name}\n{birthdate}\n"
         else:
@@ -130,6 +133,11 @@ def run_patientenverfuegung(name, birthdate):
     print("\n=== Generiere Patientenverfügung ===")
     return run_script_in_subprocess(PATIENTENVERFUEGUNG_PATH, name, birthdate)
 
+def run_vollmacht(name, birthdate):
+    """Führt das Vollmachtsskript aus."""
+    print("\n=== Generiere Vollmacht ===")
+    return run_script_in_subprocess(VOLLMACHT_PATH, name, birthdate, script_type="vollmacht")
+
 def cleanup():
     """Löscht die temporären Daten."""
     if TEMP_DATA_FILE.exists():
@@ -147,7 +155,8 @@ def main():
         available_scripts = [
             ("Kündigung", run_kuendigung),
             ("Testament", run_testament),
-            ("Patientenverfügung", run_patientenverfuegung)
+            ("Patientenverfügung", run_patientenverfuegung),
+            ("Vollmacht", run_vollmacht)
         ]
         
         selected_scripts = random.sample(available_scripts, 2)
