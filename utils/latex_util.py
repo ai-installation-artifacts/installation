@@ -73,7 +73,7 @@ def save_latex(content: str, output_dir: Path, filename: str) -> Path:
     tex_path.write_text(content, encoding='utf-8')
     return tex_path
 
-def compile_pdf(tex_path: Path, template_dir: Path, logo_name: str = None) -> Path:
+def compile_pdf(tex_path: Path, template_dir: Path, logo_name: str = None, signature_name: str = None) -> Path:
     """Compile LaTeX to PDF, trying different engines."""
     output_dir = tex_path.parent
     pdf_path = tex_path.with_suffix('.pdf')
@@ -82,6 +82,23 @@ def compile_pdf(tex_path: Path, template_dir: Path, logo_name: str = None) -> Pa
         logo_src = template_dir / logo_name
         if logo_src.exists():
             shutil.copy(logo_src, output_dir / logo_name)
+    
+    # Erstelle das Signature-Verzeichnis im Output-Verzeichnis, falls es benötigt wird
+    signature_output_dir = output_dir / "Signature"
+    signature_output_dir.mkdir(exist_ok=True)
+    
+    if signature_name:
+        # Suche die Unterschrift im Signature-Verzeichnis neben dem templates-Verzeichnis
+        signature_src = template_dir.parent / "Signature" / signature_name
+        if signature_src.exists():
+            # Kopiere die Unterschrift ins Signature-Unterverzeichnis des Output-Verzeichnisses
+            shutil.copy(signature_src, signature_output_dir / signature_name)
+        else:
+            # Fallback: Suche die Unterschrift direkt im templates-Verzeichnis
+            signature_src = template_dir / signature_name
+            if signature_src.exists():
+                # Kopiere die Unterschrift ins Signature-Unterverzeichnis des Output-Verzeichnisses
+                shutil.copy(signature_src, signature_output_dir / signature_name)
 
     for compiler in ["pdflatex"]:
         try:

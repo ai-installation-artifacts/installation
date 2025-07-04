@@ -26,6 +26,7 @@ from patientenverfuegung_util import (
 OUTPUT_DIR = project_root / "out"
 TEMPLATE_PATH = project_root / "templates" / "Patientenverfügung_template.tex"
 LOGO_NAME = "notarlogo.png"
+SIGNATURE_NAME = "Unterschrift.png"
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL_NAME = "llama3.2"
 
@@ -42,7 +43,9 @@ def create_latex_content(name: str, birthdate: str, sections: dict) -> str:
         placeholder = f"%% {SECTION_PLACEHOLDERS[key]} %%"
         replacements[placeholder] = sections.get(key, '')
 
-    return build_latex(template_content, replacements)
+    latex_content = build_latex(template_content, replacements)
+    
+    return latex_content
 
 def main(name: str, birthdate: str, compile_pdf_flag: bool = True):
     """Main workflow to generate and optionally compile the patient's provision."""
@@ -61,7 +64,7 @@ def main(name: str, birthdate: str, compile_pdf_flag: bool = True):
     if compile_pdf_flag:
         try:
             template_dir = TEMPLATE_PATH.parent
-            pdf_file = compile_pdf(tex_file, template_dir, LOGO_NAME)
+            pdf_file = compile_pdf(tex_file, template_dir, LOGO_NAME, SIGNATURE_NAME)
             print(f"📄 PDF erfolgreich erstellt: {pdf_file}")
             return pdf_file
         except Exception as e:

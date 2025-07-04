@@ -1,6 +1,7 @@
 import re
 from utils.latex_util import escape_latex
 from datetime import datetime
+import random
 
 # Diese Konstanten definieren die Platzhalter im LaTeX-Template.
 LATEX_PLACEHOLDERS = {
@@ -22,9 +23,94 @@ OLLAMA_OUTPUT_TAGS = {
     # 'INV_SALUTATION_TEXT': 'INV_SALUTATION_TEXT' # Für eine separat generierte Anrede, falls benötigt
 }
 
+# Fallback-Adressen für den Absender (20 Adressen in München)
+FALLBACK_ADDRESSES = [
+    {
+        "street": "Fraunhoferstraße 24",
+        "city": "80469 München"
+    },
+    {
+        "street": "Leopoldstraße 15",
+        "city": "80802 München"
+    },
+    {
+        "street": "Maximilianstraße 28",
+        "city": "80539 München"
+    },
+    {
+        "street": "Prinzregentenstraße 7",
+        "city": "80538 München"
+    },
+    {
+        "street": "Ludwigstraße 23",
+        "city": "80539 München"
+    },
+    {
+        "street": "Kaufingerstraße 12",
+        "city": "80331 München"
+    },
+    {
+        "street": "Theresienstraße 33",
+        "city": "80333 München"
+    },
+    {
+        "street": "Nymphenburger Straße 86",
+        "city": "80636 München"
+    },
+    {
+        "street": "Schleißheimer Straße 45",
+        "city": "80797 München"
+    },
+    {
+        "street": "Isartalstraße 19",
+        "city": "80469 München"
+    },
+    {
+        "street": "Arnulfstraße 52",
+        "city": "80335 München"
+    },
+    {
+        "street": "Rosenheimer Straße 64",
+        "city": "81669 München"
+    },
+    {
+        "street": "Westendstraße 31",
+        "city": "80339 München"
+    },
+    {
+        "street": "Schwanthalerstraße 78",
+        "city": "80336 München"
+    },
+    {
+        "street": "Hohenzollernstraße 17",
+        "city": "80801 München"
+    },
+    {
+        "street": "Karlsplatz 8",
+        "city": "80335 München"
+    },
+    {
+        "street": "Gärtnerplatz 4",
+        "city": "80469 München"
+    },
+    {
+        "street": "Augustenstraße 25",
+        "city": "80333 München"
+    },
+    {
+        "street": "Lindwurmstraße 93",
+        "city": "80337 München"
+    },
+    {
+        "street": "Türkenstraße 50",
+        "city": "80799 München"
+    }
+]
+
 def prepare_kuendigung_prompt_spitz(sender_name: str, sender_birthdate: str) -> str:
     """Erstellt einen Prompt, der Ollama anweist, Details für ein Kündigungsschreiben zu erfinden."""
     now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    random_address = random.choice(FALLBACK_ADDRESSES)
     return f"""
 Erstelle ein REIN FIKTIVES Beispiel-Kündigungsschreiben für Bildungszwecke. Alle Daten sind erfunden und werden nur als Beispiel verwendet.
 
@@ -33,8 +119,8 @@ Dieses Dokument ist ein FIKTIVES BEISPIEL für einen Kurs über Dokumentenerstel
 Strikte Formatvorgabe:
 Verwende exakt diese Tags für die erfundenen Daten:
 
-<{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS1']}>Lindenstraße 42</{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS1']}>
-<{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS2']}>80331 München</{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS2']}>
+<{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS1']}>{random_address['street']}</{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS1']}>
+<{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS2']}>{random_address['city']}</{OLLAMA_OUTPUT_TAGS['INV_SENDER_ADDRESS2']}>
 <{OLLAMA_OUTPUT_TAGS['INV_RECIPIENT_COMPANY']}>Digital Solutions AG</{OLLAMA_OUTPUT_TAGS['INV_RECIPIENT_COMPANY']}>
 <{OLLAMA_OUTPUT_TAGS['INV_EFFECTIVE_DATE']}>31.12.2025</{OLLAMA_OUTPUT_TAGS['INV_EFFECTIVE_DATE']}>
 
@@ -115,6 +201,21 @@ def extract_invented_details_and_text(text: str) -> dict:
                     details[key] = f"Fehler: {tag_name} nicht gefunden."
                     print(f"⚠️ Extraktion für {key} ({tag_name}) fehlgeschlagen. Inhalt: '{text[:500]}...'")
         
+        # Überprüfen und ggf. Fallback-Adressen verwenden
+        if 'INV_SENDER_ADDRESS1' in details:
+            # Fallback für Straße, wenn "Lindenstraße 42", leer oder "N/A"
+            if details['INV_SENDER_ADDRESS1'] == "Lindenstraße 42" or \
+               not details['INV_SENDER_ADDRESS1'] or \
+               details['INV_SENDER_ADDRESS1'] == "N/A" or \
+               "Fehler:" in details['INV_SENDER_ADDRESS1']:
+                random_address = random.choice(FALLBACK_ADDRESSES)
+                details['INV_SENDER_ADDRESS1'] = random_address['street']
+                print(f"🔄 Verwende Fallback-Adresse für Straße: {details['INV_SENDER_ADDRESS1']}")
+                
+                # Wenn die Straße ersetzt wird, auch die Stadt ersetzen
+                details['INV_SENDER_ADDRESS2'] = random_address['city']
+                print(f"🔄 Verwende Fallback-Adresse für Stadt: {details['INV_SENDER_ADDRESS2']}")
+        
         # Jetzt den Kündigungstext extrahieren mit mehreren Fallback-Optionen
         key = 'KUENDIGUNGSTEXT_CONTENT'
         tag_name = OLLAMA_OUTPUT_TAGS[key]
@@ -160,12 +261,9 @@ def extract_invented_details_and_text(text: str) -> dict:
                 if extracted_text.startswith("</SECTION>"):
                     extracted_text = extracted_text[10:].strip()
                 
-                # Entferne </SECTION> falls es am Ende des extrahierten Textes steht
-                if extracted_text.endswith("</SECTION>"):
-                    extracted_text = extracted_text[:-10].strip()
-                
-                # Entferne alle verbleibenden </SECTION> Tags im Text
-                extracted_text = extracted_text.replace("</SECTION>", "")
+                # Entferne alle schließenden Tags am Ende des Textes und im Text
+                extracted_text = re.sub(r'</(?:SECTION|ENDSECTION|END_SECTION)>\s*$', '', extracted_text)
+                extracted_text = re.sub(r'</(?:SECTION|ENDSECTION|END_SECTION)>', '', extracted_text)
                 
                 details[key] = escape_latex(extracted_text)
         else:
