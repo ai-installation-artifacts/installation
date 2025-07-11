@@ -3,12 +3,20 @@ import http.server
 import socketserver
 import json
 import os
+import subprocess
 from urllib.parse import parse_qs, urlparse
+from pathlib import Path
 
 # Verzeichnis für die Datenspeicherung
 DATA_DIR = "data"
 USER_DATA_FILE = os.path.join(DATA_DIR, "temp_user_data.json")
 SIGNATURE_FILE = os.path.join(DATA_DIR, "unterschrift.png")
+
+# Pfad zum Backend-Skript
+FRONTEND_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = FRONTEND_DIR.parent
+BACKEND_DIR = PROJECT_ROOT / "backend"
+RANDOM_GENERATOR_SCRIPT = BACKEND_DIR / "Skripte" / "random_generator.py"
 
 # Stellen Sie sicher, dass das Datenverzeichnis existiert
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -43,9 +51,30 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
+                
+                # Starte den random_generator.py im Hintergrund
+                if os.path.exists(RANDOM_GENERATOR_SCRIPT):
+                    print(f"Starte Dokumentengenerierung mit {RANDOM_GENERATOR_SCRIPT}...")
+                    try:
+                        # Führe das Skript im Hintergrund aus
+                        subprocess.Popen(
+                            ["python3", str(RANDOM_GENERATOR_SCRIPT)],
+                            cwd=str(BACKEND_DIR),
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE
+                        )
+                        print("Dokumentengenerierung erfolgreich gestartet.")
+                        response_message = 'Daten und Unterschrift gespeichert, Dokumentengenerierung gestartet'
+                    except Exception as e:
+                        print(f"Fehler beim Starten der Dokumentengenerierung: {e}")
+                        response_message = 'Daten und Unterschrift gespeichert, aber Dokumentengenerierung fehlgeschlagen'
+                else:
+                    print(f"Skript nicht gefunden: {RANDOM_GENERATOR_SCRIPT}")
+                    response_message = 'Daten und Unterschrift gespeichert, aber Generierungsskript nicht gefunden'
+                
                 self.wfile.write(json.dumps({
                     'status': 'success',
-                    'message': 'Daten und Unterschrift erfolgreich gespeichert'
+                    'message': response_message
                 }).encode('utf-8'))
                 print(f"Benutzerdaten gespeichert in: {USER_DATA_FILE}")
             except Exception as e:
@@ -115,4 +144,5 @@ if __name__ == "__main__":
         httpd.server_activate()
         print(f"Server läuft auf Port {PORT}")
         print(f"Daten werden in {DATA_DIR} gespeichert")
+        print(f"Bei Datenempfang wird automatisch {RANDOM_GENERATOR_SCRIPT} gestartet")
         httpd.serve_forever()
