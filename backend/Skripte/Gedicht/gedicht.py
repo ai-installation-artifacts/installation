@@ -8,6 +8,7 @@ from pathlib import Path
 import datetime
 import argparse
 import shutil
+import json
 
 # Füge das Projektverzeichnis zum Pfad hinzu
 project_root = Path(__file__).resolve().parent.parent.parent
@@ -15,6 +16,7 @@ sys.path.insert(0, str(project_root))
 
 from utils.latex_util import load_template, build_latex, save_latex, compile_pdf, escape_latex
 from utils.ollama_util import call_ollama
+from utils.frontend_data_util import get_user_data_for_document
 from Skripte.Gedicht import gedicht_util
 
 # Konstanten
@@ -23,25 +25,35 @@ OUTPUT_DIR = project_root / "out"
 
 def main():
     parser = argparse.ArgumentParser(description="Generiert ein personalisiertes Gedicht")
-    parser.add_argument("name", help="Name der Person")
-    parser.add_argument("birthdate", help="Geburtsdatum der Person")
+    parser.add_argument("name", help="Name der Person", nargs='?')
+    parser.add_argument("birthdate", help="Geburtsdatum der Person", nargs='?')
     
-    # Parse Argumente oder verwende Standardwerte für Tests
-    if len(sys.argv) > 1:
+    # Hole Benutzerdaten aus dem Frontend oder über Eingabe
+    user_data = get_user_data_for_document()
+    
+    # Verwende Kommandozeilenargumente, falls vorhanden und keine Frontend-Daten gefunden wurden
+    if len(sys.argv) > 1 and ('firstname' not in user_data or not user_data['firstname']):
         args = parser.parse_args()
-        name = args.name
-        birthdate = args.birthdate
-    else:
-        # Interaktive Eingabe, falls keine Argumente übergeben wurden
-        name = input("Name: ").strip()
-        birthdate = input("Geburtsdatum (TT.MM.JJJJ): ").strip()
+        if args.name:
+            parts = args.name.split()
+            user_data['firstname'] = parts[0]
+            if len(parts) > 1:
+                user_data['lastname'] = ' '.join(parts[1:])
+            user_data['full_name'] = args.name
+        if args.birthdate:
+            user_data['birthdate_german'] = args.birthdate
+    
+    # Extrahiere die benötigten Daten
+    firstname = user_data.get('firstname', '')
+    birthdate = user_data.get('birthdate_german', '')
+    full_name = user_data.get('full_name', firstname)
     
     # Erzeuge Zeitstempel für Dateinamen
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Gedicht generieren
-    gedicht_titel = gedicht_util.generate_gedicht_title(name)
-    gedicht_text = gedicht_util.generate_gedicht_text(name, birthdate)
+    # Gedicht generieren - verwende nur den Vornamen für die Personalisierung
+    gedicht_titel = gedicht_util.generate_gedicht_title(firstname)
+    gedicht_text = gedicht_util.generate_gedicht_text(firstname, birthdate)
     
     # Format poem for LaTeX while preserving exact structure
     formatted_text = ""
@@ -63,15 +75,15 @@ def main():
     template = load_template(TEMPLATE_PATH)
     latex_content = build_latex(template, {
         "GEDICHT_TITEL": escape_latex(gedicht_titel),
-        "BENUTZER_NAME": escape_latex(name),
+        "BENUTZER_NAME": escape_latex(firstname),  # Verwende nur den Vornamen im Template
         "GEDICHT_TEXT": formatted_text  # Already escaped, don't escape again
     })
     
     # Erstelle Ausgabeverzeichnis, falls es nicht existiert
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # Speichere und kompiliere LaTeX
-    output_filename = f"{name.replace(' ', '_')}_Gedicht_{timestamp}"
+    # Speichere und kompiliere LaTeX - verwende den vollen Namen für die Datei
+    output_filename = f"{full_name.replace(' ', '_')}_Gedicht_{timestamp}"
     latex_path = save_latex(latex_content, OUTPUT_DIR, output_filename)
     
     try:
@@ -83,7 +95,6 @@ def main():
         
         # Drucken simulieren
         print("🖨️  Datei drucken ...")
-        os.system(f"lp -o media=A4 \"{pdf_path}\"")
         return True
     except Exception as e:
         print(f"🚨 Fehler beim Kompilieren von LaTeX zu PDF: {e}")
