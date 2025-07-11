@@ -43,12 +43,28 @@ def main():
     gedicht_titel = gedicht_util.generate_gedicht_title(name)
     gedicht_text = gedicht_util.generate_gedicht_text(name, birthdate)
     
+    # Format poem for LaTeX while preserving exact structure
+    formatted_text = ""
+    lines = gedicht_text.split('\n')
+    for i, line in enumerate(lines):
+        if line.strip():
+            # Escape special LaTeX characters in the line content
+            escaped_line = escape_latex(line)
+            # For non-empty lines, add a line break (not escaped)
+            formatted_text += escaped_line
+            if i < len(lines) - 1:  # Don't add line break after the last line
+                formatted_text += r" \\" + "\n"  # Raw string for LaTeX command
+        else:
+            # For empty lines (stanza breaks), add vertical space (not escaped)
+            if i < len(lines) - 1:  # Don't add space after the last line if it's empty
+                formatted_text += r"\vspace{1em}" + "\n"  # Raw string for LaTeX command
+    
     # Lade und fülle Template
     template = load_template(TEMPLATE_PATH)
     latex_content = build_latex(template, {
         "GEDICHT_TITEL": escape_latex(gedicht_titel),
         "BENUTZER_NAME": escape_latex(name),
-        "GEDICHT_TEXT": escape_latex(gedicht_text)
+        "GEDICHT_TEXT": formatted_text  # Already escaped, don't escape again
     })
     
     # Erstelle Ausgabeverzeichnis, falls es nicht existiert

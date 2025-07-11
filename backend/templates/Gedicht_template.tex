@@ -3,7 +3,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[ngerman]{babel}
-\usepackage{verse}
 \usepackage{geometry}
 
 % Seitenränder anpassen für zentriertes Layout
@@ -12,24 +11,21 @@
 % Entferne Seitenzahlen und Kopf-/Fußzeilen
 \pagestyle{empty}
 
-% Keine Einrückung der ersten Zeile jeder Strophe
-\setlength{\vindent}{0pt}
-
 \begin{document}
 
-% Vertikale Zentrierung
+% Vertikale Zentrierung - Fülle den oberen Teil der Seite
 \vspace*{\fill}
 
-% Horizontale Zentrierung mit begrenzter Breite
+% Horizontale Zentrierung des Gedichts
 \begin{center}
-\begin{minipage}{0.6\textwidth}
-\begin{verse}
+\begin{minipage}{0.8\textwidth}
+\begin{center}
 GEDICHT_TEXT
-\end{verse}
+\end{center}
 \end{minipage}
 \end{center}
 
-% Vertikale Zentrierung
+% Vertikale Zentrierung - Fülle den unteren Teil der Seite
 \vspace*{\fill}
 
 \end{document}
