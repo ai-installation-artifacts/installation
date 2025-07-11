@@ -46,9 +46,11 @@
     <div class="container">
       <h1>Unterschrift</h1>
       <p>Unterschreibe mit dem Finger:</p>
-      <div style="position: relative; display: inline-block;">
-        <canvas id="signatureCanvas" width="300" height="150"></canvas>
+      <div class="signature-wrapper">
         <button type="button" class="signature-clear-btn" title="Unterschrift löschen" onclick="clearSignatureCanvas()">🗑️</button>
+        <div class="signature-container">
+          <canvas id="signatureCanvas" width="600" height="150"></canvas>
+        </div>
       </div>
       <button class="center-button primary-button" onclick="submitData()">Absenden</button>
     </div>
