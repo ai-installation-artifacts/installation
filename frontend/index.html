@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kunst-KI Installation</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+
+  <!-- Seitenstruktur -->
+  <div id="page1" class="page active">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="container">
+      <h1>Willkommen zur KI-Installation</h1>
+      <p>Erstelle ein personalisiertes Gedicht, das mehr ist als nur ein Text.</p>
+      <button class="center-button" onclick="goToPage(2)">Start</button>
+    </div>
+  </div>
+
+  <div id="page2" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Name</h1>
+      <label for="name">Wie heißt du?</label>
+      <input type="text" id="name" name="name" />
+      <button class="next-button" onclick="goToPage(3)">Weiter</button>
+    </div>
+  </div>
+
+  <div id="page3" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Geburtsdatum</h1>
+      <p>Wähle dein Geburtsdatum aus:</p>
+      <input type="date" id="birthdate" />
+      <button class="next-button" onclick="goToPage(4)">Weiter</button>
+    </div>
+  </div>
+
+  <div id="page4" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Unterschrift</h1>
+      <p>Unterschreibe mit dem Finger:</p>
+      <div style="position: relative; display: inline-block;">
+        <canvas id="signatureCanvas" width="300" height="150"></canvas>
+        <button type="button" class="signature-clear-btn" title="Unterschrift löschen" onclick="clearSignatureCanvas()">🗑️</button>
+      </div>
+      <button class="center-button" onclick="submitData()">Absenden</button>
+    </div>
+  </div>
+
+  <div id="page5" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Bitte warten…</h1>
+      <p>Deine Eingaben werden verarbeitet.</p>
+    </div>
+  </div>
+
+  <div id="page6" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Fast geschafft!</h1>
+      <p>Dein Gedicht ist bereit. Lies dir die Info durch und drücke weiter.</p>
+      <button class="next-button" onclick="goToPage(7)">Weiter</button>
+    </div>
+  </div>
+
+  <div id="page7" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Daten löschen</h1>
+      <p>Wenn du deine Daten löschen willst, klicke hier.</p>
+      <button class="center-button" onclick="deleteUserData()">Meine Daten löschen</button>
+    </div>
+  </div>
+
+  <div id="page8" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="container">
+      <h1>Danke für deine Teilnahme</h1>
+      <p>Schön, dass du mitgemacht hast!</p>
+      <button class="next-button" onclick="goToPage(9)">Weiter</button>
+    </div>
+  </div>
+
+  <div id="page9" class="page">
+    <img src="assets/Logo.svg" class="logo" alt="Logo" />
+    <div class="container">
+      <h1>Zurück zum Start</h1>
+      <img src="assets/images/QR-Code.png" alt="Finales Bild" />
+      <button class="center-button" onclick="goToPage(1)">Zurück zum Start</button>
+    </div>
+  </div>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

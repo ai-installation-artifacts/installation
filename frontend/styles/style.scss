@@ -1,0 +1,120 @@
+@import 'variables';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: $font-family;
+  font-size: $font-size-base;
+  background-color: $color-bg;
+  color: $color-text;
+}
+
+.page {
+  width: 100vw;
+  height: 100vh;
+  padding: $page-padding;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.page.active {
+  display: flex;
+}
+
+.logo {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: $logo-width;
+}
+
+.exit-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  cursor: pointer;
+  color: $color-exit;
+}
+
+.container {
+  max-width: $container-max-width;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  padding-bottom: 60px; // Platz für den Button unten
+}
+
+h1 {
+  font-weight: $font-weight-title;
+  font-size: $font-size-base;
+}
+
+p, label {
+  font-size: $font-size-base;
+}
+
+input[type="text"],
+input[type="date"] {
+  padding: 0.5rem;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  border: none;
+  border-radius: 4px;
+}
+
+canvas {
+  border: 1px solid #aaa;
+  background-color: #fff;
+}
+
+button {
+  padding: 0.7rem 1.5rem;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  font-weight: $font-weight-title;
+  background-color: $color-button-bg;
+  color: $color-button-text;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+// Allgemeines Button-Styling (zentriert)
+button {
+  margin: 0 auto;
+  display: block;
+}
+
+// Spezifisches Styling nur für Weiter-Buttons
+button.next-button:not([data-center]) {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 150px; // etwa 2 Columns breit
+  margin: 0; // Überschreibt das margin: 0 auto von oben
+}
