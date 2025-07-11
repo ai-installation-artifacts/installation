@@ -112,9 +112,9 @@ button {
 
 // Spezifisches Styling nur für Weiter-Buttons
 button.next-button:not([data-center]) {
-  position: absolute;
-  bottom: 0;
-  right: 0;
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
   width: 150px; // etwa 2 Columns breit
   margin: 0; // Überschreibt das margin: 0 auto von oben
 }
