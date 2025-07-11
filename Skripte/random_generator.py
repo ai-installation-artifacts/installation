@@ -17,6 +17,7 @@ TESTAMENT_PATH = project_root / "Skripte" / "Testament" / "testament.py"
 PATIENTENVERFUEGUNG_PATH = project_root / "Skripte" / "Patientenverfuegung" / "patientenverfuegung.py"
 VOLLMACHT_PATH = project_root / "Skripte" / "Vollmacht" / "vollmacht.py"
 RECHNUNG_PATH = project_root / "Skripte" / "Rechnung" / "rechnung.py"
+GEDICHT_PATH = project_root / "Skripte" / "Gedicht" / "gedicht.py"
 
 # Temporäre Datei für die Zwischenspeicherung der Eingabedaten
 TEMP_DATA_FILE = project_root / "temp_user_data.json"
@@ -144,6 +145,11 @@ def run_rechnung(name, birthdate):
     print("\n=== Generiere Rechnung ===")
     return run_script_in_subprocess(RECHNUNG_PATH, name, birthdate, script_type="vollmacht")
 
+def run_gedicht(name, birthdate):
+    """Führt das Gedicht-Skript aus."""
+    print("\n=== Generiere personalisiertes Gedicht ===")
+    return run_script_in_subprocess(GEDICHT_PATH, name, birthdate)
+
 def cleanup():
     """Löscht die temporären Daten."""
     if TEMP_DATA_FILE.exists():
@@ -157,7 +163,11 @@ def main():
         name = user_data["name"]
         birthdate = user_data["birthdate"]
         
-        # 2. Zwei zufällige Skripte auswählen
+        # 2. Immer zuerst ein Gedicht generieren
+        print("\nGeneriere personalisiertes Gedicht als erstes Dokument...")
+        gedicht_success = run_gedicht(name, birthdate)
+        
+        # 3. Zwei zufällige weitere Skripte auswählen
         available_scripts = [
             ("Kündigung", run_kuendigung),
             ("Testament", run_testament),
@@ -168,27 +178,29 @@ def main():
         
         selected_scripts = random.sample(available_scripts, 2)
         
-        print(f"\nEs wurden folgende Dokumente zufällig ausgewählt:")
+        print(f"\nAls weitere Dokumente wurden zufällig ausgewählt:")
         for i, (script_name, _) in enumerate(selected_scripts, 1):
             print(f"{i}. {script_name}")
         
-        # 3. Die ausgewählten Skripte ausführen
+        # 4. Die ausgewählten Skripte ausführen
         success_count = 0
         for _, script_func in selected_scripts:
             if script_func(name, birthdate):
                 success_count += 1
         
-        if success_count == 2:
-            print("\n✅ Alle Dokumente wurden erfolgreich generiert.")
+        # 5. Erfolgsmeldung ausgeben
+        total_success = (gedicht_success + success_count)
+        if total_success == 3:
+            print("\n✅ Alle drei Dokumente wurden erfolgreich generiert.")
         else:
-            print(f"\n⚠️ {success_count} von 2 Dokumenten wurden generiert.")
+            print(f"\n⚠️ {total_success} von 3 Dokumenten wurden generiert.")
         
         print("Die generierten Dokumente finden Sie im 'out'-Verzeichnis.")
         
     except Exception as e:
         print(f"Fehler bei der Ausführung: {e}")
     finally:
-        # 4. Aufräumen
+        # 6. Aufräumen
         cleanup()
 
 if __name__ == "__main__":
