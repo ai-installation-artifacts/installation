@@ -23,8 +23,17 @@
     <div class="exit-button" onclick="resetAndGoHome()">X</div>
     <div class="container">
       <h1>Name</h1>
-      <label for="name">Wie heißt du?</label>
-      <input type="text" id="name" name="name" />
+      <p>Wie heißt du?</p>
+      <div class="name-fields-container">
+        <div class="name-field">
+          <label for="firstname">Vorname</label>
+          <input type="text" id="firstname" name="firstname" />
+        </div>
+        <div class="name-field">
+          <label for="lastname">Nachname</label>
+          <input type="text" id="lastname" name="lastname" />
+        </div>
+      </div>
       <button class="next-button" onclick="goToPage(3)">Weiter</button>
     </div>
   </div>
