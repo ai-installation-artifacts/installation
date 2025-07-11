@@ -1,0 +1,35 @@
+% Gedicht Template - Minimalistisch
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{verse}
+\usepackage{geometry}
+
+% Seitenränder anpassen für zentriertes Layout
+\geometry{a4paper, margin=2.5cm}
+
+% Entferne Seitenzahlen und Kopf-/Fußzeilen
+\pagestyle{empty}
+
+% Keine Einrückung der ersten Zeile jeder Strophe
+\setlength{\vindent}{0pt}
+
+\begin{document}
+
+% Vertikale Zentrierung
+\vspace*{\fill}
+
+% Horizontale Zentrierung mit begrenzter Breite
+\begin{center}
+\begin{minipage}{0.6\textwidth}
+\begin{verse}
+GEDICHT_TEXT
+\end{verse}
+\end{minipage}
+\end{center}
+
+% Vertikale Zentrierung
+\vspace*{\fill}
+
+\end{document}
