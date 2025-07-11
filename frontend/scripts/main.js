@@ -36,7 +36,8 @@ function goToPage(pageNumber) {
 // Funktion zum Zurücksetzen und zur Startseite gehen
 function resetAndGoHome() {
   // Formularfelder zurücksetzen
-  document.getElementById('name').value = '';
+  document.getElementById('firstname').value = '';
+  document.getElementById('lastname').value = '';
   if (document.getElementById('birthdate')) {
     document.getElementById('birthdate').value = '';
   }
@@ -48,7 +49,8 @@ function resetAndGoHome() {
 // Funktion zum Absenden der Daten
 function submitData() {
   // Daten sammeln
-  const name = document.getElementById('name').value;
+  const firstname = document.getElementById('firstname').value;
+  const lastname = document.getElementById('lastname').value;
   const birthdate = document.getElementById('birthdate').value;
   
   // Signatur-Daten als blaue PNG
@@ -59,7 +61,8 @@ function submitData() {
   
   // Daten-Objekt erstellen
   const userData = {
-    name,
+    firstname,
+    lastname,
     birthdate,
     timestamp: new Date().toISOString()
   };
@@ -259,9 +262,11 @@ function initializeSignatureCanvas() {
 // Validierung für Pflichtfelder einrichten
 function setupValidation() {
   // Validierung für Seite 2 (Name)
-  const nameInput = document.getElementById('name');
-  if (nameInput) {
-    nameInput.addEventListener('input', () => validatePage(2));
+  const firstnameInput = document.getElementById('firstname');
+  const lastnameInput = document.getElementById('lastname');
+  if (firstnameInput && lastnameInput) {
+    firstnameInput.addEventListener('input', () => validatePage(2));
+    lastnameInput.addEventListener('input', () => validatePage(2));
     validatePage(2);
   }
   
@@ -280,8 +285,9 @@ function validatePage(pageNumber) {
   
   switch (pageNumber) {
     case 2: // Name-Seite
-      const nameInput = document.getElementById('name');
-      isValid = nameInput && nameInput.value.trim().length > 0;
+      const firstnameInput = document.getElementById('firstname');
+      const lastnameInput = document.getElementById('lastname');
+      isValid = firstnameInput && lastnameInput && firstnameInput.value.trim().length > 0 && lastnameInput.value.trim().length > 0;
       nextButton = document.querySelector('#page2 .next-button');
       break;
       
