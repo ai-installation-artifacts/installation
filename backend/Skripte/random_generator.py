@@ -11,6 +11,9 @@ import subprocess
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
 
+# Import the frontend data utility
+from utils.frontend_data_util import get_user_data_for_document
+
 # Pfade zu den Skripten
 KUENDIGUNG_PATH = project_root / "Skripte" / "Kuendigung" / "kuendigung.py"
 TESTAMENT_PATH = project_root / "Skripte" / "Testament" / "testament.py"
@@ -19,36 +22,15 @@ VOLLMACHT_PATH = project_root / "Skripte" / "Vollmacht" / "vollmacht.py"
 RECHNUNG_PATH = project_root / "Skripte" / "Rechnung" / "rechnung.py"
 GEDICHT_PATH = project_root / "Skripte" / "Gedicht" / "gedicht.py"
 
-# Temporäre Datei für die Zwischenspeicherung der Eingabedaten
-TEMP_DATA_FILE = project_root / "temp_user_data.json"
-
-def collect_user_input():
-    """Sammelt Benutzereingaben und speichert sie temporär."""
-    
-    name = input("Name: ").strip()
-    birthdate = input("Geburtsdatum (TT.MM.JJJJ): ").strip()
-    
-    # Validierung der Eingaben
-    if not name or not birthdate:
-        print("Fehler: Name und Geburtsdatum dürfen nicht leer sein.")
-        sys.exit(1)
-    
-    # Speichern der Daten in einer temporären Datei
-    user_data = {
-        "name": name,
-        "birthdate": birthdate
-    }
-    
-    with open(TEMP_DATA_FILE, 'w') as f:
-        json.dump(user_data, f)
-    
-    return user_data
-
-def run_script_in_subprocess(script_path, name, birthdate, script_type=None):
+def run_script_in_subprocess(script_path, user_data, script_type=None):
     """Führt ein Skript als separaten Prozess aus und übergibt die Benutzerdaten als Argumente."""
     try:
         # Wechsle in das Verzeichnis des Skripts, um relative Imports zu ermöglichen
         script_dir = script_path.parent
+        
+        # Extrahiere die benötigten Daten
+        full_name = user_data.get('full_name', '')
+        birthdate = user_data.get('birthdate_german', '')
         
         # Bereite die Kommandozeile basierend auf dem Skripttyp vor
         if script_type in ["kuendigung", "vollmacht"]:
@@ -57,10 +39,10 @@ def run_script_in_subprocess(script_path, name, birthdate, script_type=None):
             if script_type == "kuendigung":
                 cmd.append("--no_print")  # Nur für Kündigung
             # Wir werden input() mit einem Pipe-Trick überschreiben
-            input_data = f"{name}\n{birthdate}\n"
+            input_data = f"{full_name}\n{birthdate}\n"
         else:
             # Testament und Patientenverfügung verwenden positionelle Argumente
-            cmd = [sys.executable, str(script_path), name, birthdate]
+            cmd = [sys.executable, str(script_path), full_name, birthdate]
             input_data = None
         
         # Führe das Skript im Unterverzeichnis aus
@@ -120,54 +102,51 @@ def run_script_in_subprocess(script_path, name, birthdate, script_type=None):
         print(f"Fehler beim Ausführen des Skripts: {e}")
         return False
 
-def run_kuendigung(name, birthdate):
+def run_kuendigung(user_data):
     """Führt das Kündigungsskript aus."""
     print("\n=== Generiere Kündigungsschreiben ===")
-    return run_script_in_subprocess(KUENDIGUNG_PATH, name, birthdate, script_type="kuendigung")
+    return run_script_in_subprocess(KUENDIGUNG_PATH, user_data, script_type="kuendigung")
 
-def run_testament(name, birthdate):
+def run_testament(user_data):
     """Führt das Testamentsskript aus."""
     print("\n=== Generiere Testament ===")
-    return run_script_in_subprocess(TESTAMENT_PATH, name, birthdate)
+    return run_script_in_subprocess(TESTAMENT_PATH, user_data)
 
-def run_patientenverfuegung(name, birthdate):
+def run_patientenverfuegung(user_data):
     """Führt das Patientenverfügungsskript aus."""
     print("\n=== Generiere Patientenverfügung ===")
-    return run_script_in_subprocess(PATIENTENVERFUEGUNG_PATH, name, birthdate)
+    return run_script_in_subprocess(PATIENTENVERFUEGUNG_PATH, user_data)
 
-def run_vollmacht(name, birthdate):
+def run_vollmacht(user_data):
     """Führt das Vollmachtsskript aus."""
     print("\n=== Generiere Vollmacht ===")
-    return run_script_in_subprocess(VOLLMACHT_PATH, name, birthdate, script_type="vollmacht")
+    return run_script_in_subprocess(VOLLMACHT_PATH, user_data, script_type="vollmacht")
 
-def run_rechnung(name, birthdate):
+def run_rechnung(user_data):
     """Führt das Rechnungsskript aus."""
     print("\n=== Generiere Rechnung ===")
-    return run_script_in_subprocess(RECHNUNG_PATH, name, birthdate, script_type="vollmacht")
+    return run_script_in_subprocess(RECHNUNG_PATH, user_data, script_type="vollmacht")
 
-def run_gedicht(name, birthdate):
+def run_gedicht(user_data):
     """Führt das Gedicht-Skript aus."""
     print("\n=== Generiere personalisiertes Gedicht ===")
-    return run_script_in_subprocess(GEDICHT_PATH, name, birthdate)
-
-def cleanup():
-    """Löscht die temporären Daten."""
-    if TEMP_DATA_FILE.exists():
-        TEMP_DATA_FILE.unlink()
-        print("\nBenutzerinformationen wurden gelöscht.")
+    return run_script_in_subprocess(GEDICHT_PATH, user_data)
 
 def main():
     try:
-        # 1. Benutzereingaben sammeln
-        user_data = collect_user_input()
-        name = user_data["name"]
-        birthdate = user_data["birthdate"]
+        # Hole Benutzerdaten aus dem Frontend oder über Eingabe
+        user_data = get_user_data_for_document()
         
-        # 2. Immer zuerst ein Gedicht generieren
+        # Prüfe, ob die notwendigen Daten vorhanden sind
+        if not user_data.get('firstname') or not user_data.get('birthdate_german'):
+            print("Fehler: Vorname und Geburtsdatum sind erforderlich.")
+            return
+        
+        # 1. Immer zuerst ein Gedicht generieren
         print("\nGeneriere personalisiertes Gedicht als erstes Dokument...")
-        gedicht_success = run_gedicht(name, birthdate)
+        gedicht_success = run_gedicht(user_data)
         
-        # 3. Zwei zufällige weitere Skripte auswählen
+        # 2. Zwei zufällige weitere Skripte auswählen
         available_scripts = [
             ("Kündigung", run_kuendigung),
             ("Testament", run_testament),
@@ -182,13 +161,13 @@ def main():
         for i, (script_name, _) in enumerate(selected_scripts, 1):
             print(f"{i}. {script_name}")
         
-        # 4. Die ausgewählten Skripte ausführen
+        # 3. Die ausgewählten Skripte ausführen
         success_count = 0
         for _, script_func in selected_scripts:
-            if script_func(name, birthdate):
+            if script_func(user_data):
                 success_count += 1
         
-        # 5. Erfolgsmeldung ausgeben
+        # 4. Erfolgsmeldung ausgeben
         total_success = (gedicht_success + success_count)
         if total_success == 3:
             print("\n✅ Alle drei Dokumente wurden erfolgreich generiert.")
@@ -199,9 +178,6 @@ def main():
         
     except Exception as e:
         print(f"Fehler bei der Ausführung: {e}")
-    finally:
-        # 6. Aufräumen
-        cleanup()
 
 if __name__ == "__main__":
     main()
