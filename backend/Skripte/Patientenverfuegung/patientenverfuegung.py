@@ -1,4 +1,5 @@
 import sys
+import argparse
 from pathlib import Path
 
 # Add project root to sys.path to allow imports from the 'utils' directory
@@ -24,7 +25,7 @@ from patientenverfuegung_util import (
 
 # Configuration
 OUTPUT_DIR = project_root / "out"
-TEMPLATE_PATH = project_root / "templates" / "Patientenverfügung_template.tex"
+TEMPLATE_PATH = project_root / "templates" / "Patientenverfügung_template.tex"
 LOGO_NAME = "notarlogo.png"
 SIGNATURE_NAME = "Unterschrift.png"
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -47,7 +48,7 @@ def create_latex_content(name: str, birthdate: str, sections: dict) -> str:
     
     return latex_content
 
-def main(name: str, birthdate: str, compile_pdf_flag: bool = True):
+def main(name: str, birthdate: str, compile_pdf_flag: bool = True, no_print: bool = False):
     """Main workflow to generate and optionally compile the patient's provision."""
     print("💬 Generiere Patientenverfügungs-Text ...")
     prompt = prepare_patientenverfuegung_prompt(name, birthdate)
@@ -66,19 +67,32 @@ def main(name: str, birthdate: str, compile_pdf_flag: bool = True):
             template_dir = TEMPLATE_PATH.parent
             pdf_file = compile_pdf(tex_file, template_dir, LOGO_NAME, SIGNATURE_NAME)
             print(f"📄 PDF erfolgreich erstellt: {pdf_file}")
+            
+            # Drucken nur, wenn no_print nicht gesetzt ist
+            if not no_print:
+                print("🖨️  Datei drucken ...")
+                print_file(pdf_file)
+            else:
+                print("🚫 Drucken übersprungen.")
+                
             return pdf_file
         except Exception as e:
             print(f"⚠️ Fehler bei der PDF-Erstellung: {e}")
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        user_name, user_birthdate = sys.argv[1], sys.argv[2]
-    else:
+    # Argumente parsen
+    parser = argparse.ArgumentParser(description="Generiert eine Patientenverfügung")
+    parser.add_argument("name", nargs="?", help="Name der Person")
+    parser.add_argument("birthdate", nargs="?", help="Geburtsdatum der Person")
+    parser.add_argument("--no_print", action="store_true", help="PDF nach Erstellung nicht drucken")
+    args = parser.parse_args()
+    
+    # Wenn keine Argumente übergeben wurden, interaktiv abfragen
+    if not args.name or not args.birthdate:
         user_name = input("Name: ").strip()
         user_birthdate = input("Geburtsdatum: ").strip()
+    else:
+        user_name = args.name
+        user_birthdate = args.birthdate
     
-    pdf_path = main(user_name, user_birthdate)
-
-    if pdf_path:
-        print("🖨️  Datei drucken ...")
-        print_file(pdf_path)
+    pdf_path = main(user_name, user_birthdate, no_print=args.no_print)

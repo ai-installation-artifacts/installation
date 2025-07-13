@@ -36,13 +36,20 @@ def run_script_in_subprocess(script_path, user_data, script_type=None):
         if script_type in ["kuendigung", "vollmacht"]:
             # Kündigungs- und Vollmachtsskript verwenden interaktive Eingabe
             cmd = [sys.executable, str(script_path)]
-            if script_type == "kuendigung":
-                cmd.append("--no_print")  # Nur für Kündigung
+            cmd.append("--no_print")  # Für alle Skripte das Drucken deaktivieren
             # Wir werden input() mit einem Pipe-Trick überschreiben
             input_data = f"{full_name}\n{birthdate}\n"
+        elif script_type == "patientenverfuegung":
+            # Patientenverfügung verwendet jetzt argparse
+            cmd = [sys.executable, str(script_path), "--no_print"]
+            input_data = f"{full_name}\n{birthdate}\n"
+        elif script_type == "rechnung":
+            # Rechnung verwendet argparse
+            cmd = [sys.executable, str(script_path), "--no_print"]
+            input_data = f"{full_name}\n{birthdate}\n"
         else:
-            # Testament und Patientenverfügung verwenden positionelle Argumente
-            cmd = [sys.executable, str(script_path), full_name, birthdate]
+            # Testament und andere verwenden positionelle Argumente
+            cmd = [sys.executable, str(script_path), full_name, birthdate, "--no_print"]
             input_data = None
         
         # Führe das Skript im Unterverzeichnis aus
@@ -69,7 +76,16 @@ def run_script_in_subprocess(script_path, user_data, script_type=None):
                 if stderr:
                     print(f"Fehler beim Ausführen des Skripts (Exit-Code {process.returncode}):")
                     print(stderr.strip())
-                return False
+                return False, None
+                
+            # Extrahiere den PDF-Pfad aus der Ausgabe
+            pdf_path = None
+            for line in stdout.splitlines():
+                if "PDF erfolgreich erstellt:" in line:
+                    pdf_path = line.split("PDF erfolgreich erstellt:")[-1].strip()
+                    break
+            
+            return True, pdf_path
         else:
             # Normale Ausführung ohne stdin-Eingabe
             process = subprocess.Popen(
@@ -80,13 +96,15 @@ def run_script_in_subprocess(script_path, user_data, script_type=None):
                 universal_newlines=True
             )
             
-            # Ausgabe in Echtzeit anzeigen
+            # Ausgabe sammeln und in Echtzeit anzeigen
+            stdout_lines = []
             while True:
                 output = process.stdout.readline()
                 if output == '' and process.poll() is not None:
                     break
                 if output:
                     print(output.strip())
+                    stdout_lines.append(output.strip())
             
             # Prüfe, ob es Fehler gab
             return_code = process.poll()
@@ -94,13 +112,20 @@ def run_script_in_subprocess(script_path, user_data, script_type=None):
                 error = process.stderr.read()
                 print(f"Fehler beim Ausführen des Skripts (Exit-Code {return_code}):")
                 print(error)
-                return False
-        
-        return True
+                return False, None
+            
+            # Extrahiere den PDF-Pfad aus der Ausgabe
+            pdf_path = None
+            for line in stdout_lines:
+                if "PDF erfolgreich erstellt:" in line:
+                    pdf_path = line.split("PDF erfolgreich erstellt:")[-1].strip()
+                    break
+            
+            return True, pdf_path
     
     except Exception as e:
         print(f"Fehler beim Ausführen des Skripts: {e}")
-        return False
+        return False, None
 
 def run_kuendigung(user_data):
     """Führt das Kündigungsskript aus."""
@@ -125,7 +150,7 @@ def run_vollmacht(user_data):
 def run_rechnung(user_data):
     """Führt das Rechnungsskript aus."""
     print("\n=== Generiere Rechnung ===")
-    return run_script_in_subprocess(RECHNUNG_PATH, user_data, script_type="vollmacht")
+    return run_script_in_subprocess(RECHNUNG_PATH, user_data, script_type="rechnung")
 
 def run_gedicht(user_data):
     """Führt das Gedicht-Skript aus."""
@@ -142,9 +167,14 @@ def main():
             print("Fehler: Vorname und Geburtsdatum sind erforderlich.")
             return
         
+        # Liste zum Sammeln der PDF-Pfade
+        pdf_paths = []
+        
         # 1. Immer zuerst ein Gedicht generieren
         print("\nGeneriere personalisiertes Gedicht als erstes Dokument...")
-        gedicht_success = run_gedicht(user_data)
+        gedicht_success, gedicht_pdf = run_gedicht(user_data)
+        if gedicht_pdf:
+            pdf_paths.append(gedicht_pdf)
         
         # 2. Zwei zufällige weitere Skripte auswählen
         available_scripts = [
@@ -164,8 +194,11 @@ def main():
         # 3. Die ausgewählten Skripte ausführen
         success_count = 0
         for _, script_func in selected_scripts:
-            if script_func(user_data):
+            success, pdf_path = script_func(user_data)
+            if success:
                 success_count += 1
+                if pdf_path:
+                    pdf_paths.append(pdf_path)
         
         # 4. Erfolgsmeldung ausgeben
         total_success = (gedicht_success + success_count)
@@ -175,6 +208,16 @@ def main():
             print(f"\n⚠️ {total_success} von 3 Dokumenten wurden generiert.")
         
         print("Die generierten Dokumente finden Sie im 'out'-Verzeichnis.")
+        
+        # 5. Alle generierten PDFs zusammen drucken
+        if pdf_paths:
+            print(f"\n🖨️ Drucke {len(pdf_paths)} Dokumente...")
+            # Importiere die print_file Funktion
+            from utils.latex_util import print_file
+            for pdf_path in pdf_paths:
+                print(f"Drucke: {pdf_path}")
+                print_file(pdf_path)
+            print("✅ Druckaufträge abgeschlossen.")
         
     except Exception as e:
         print(f"Fehler bei der Ausführung: {e}")

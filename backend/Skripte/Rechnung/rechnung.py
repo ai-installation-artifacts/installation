@@ -7,6 +7,7 @@ import re
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
+import argparse
 
 # Handle potential missing requests package
 try:
@@ -224,6 +225,11 @@ def main():
     Hauptfunktion zur Generierung der Rechnung.
     """
     try:
+        # Kommandozeilenargumente parsen
+        parser = argparse.ArgumentParser(description="Generiert eine satirische Rechnung.")
+        parser.add_argument("--no_print", action="store_true", help="PDF nach Erstellung nicht drucken.")
+        args = parser.parse_args()
+        
         # Benutzereingaben sammeln
         name, street, zipcode, birthdate = get_user_input()
         
@@ -281,9 +287,14 @@ def main():
         if pdf_path:
             print(f"📄 PDF erfolgreich erstellt: {pdf_path}")
             
-            # PDF drucken
-            print("🖨️  Datei drucken ...")
-            print_file(pdf_path)
+            # PDF drucken nur wenn --no_print nicht gesetzt ist
+            if not args.no_print:
+                print("🖨️  Datei drucken ...")
+                print_file(pdf_path)
+            else:
+                print("🚫 Drucken übersprungen.")
+            
+            return pdf_path
         
     except FileNotFoundError as e:
         print(f"❌ Datei nicht gefunden: {e}")

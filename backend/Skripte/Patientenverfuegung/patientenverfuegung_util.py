@@ -63,7 +63,7 @@ Formatierungsregeln:
 ---
 
 Verboten:
-- KEIN Hinweis auf KI, Disclaimer oder Beispielcharakter.
+- KEIN Hinweis auf Fiktivität, KI, Disclaimer oder Beispielcharakter.
 - KEINE Metatexte oder Kommentare.
 
 Anfragezeitpunkt: {now}

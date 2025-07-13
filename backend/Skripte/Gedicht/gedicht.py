@@ -27,13 +27,14 @@ def main():
     parser = argparse.ArgumentParser(description="Generiert ein personalisiertes Gedicht")
     parser.add_argument("name", help="Name der Person", nargs='?')
     parser.add_argument("birthdate", help="Geburtsdatum der Person", nargs='?')
+    parser.add_argument("--no_print", action="store_true", help="PDF nach Erstellung nicht drucken.")
     
     # Hole Benutzerdaten aus dem Frontend oder über Eingabe
     user_data = get_user_data_for_document()
     
     # Verwende Kommandozeilenargumente, falls vorhanden und keine Frontend-Daten gefunden wurden
+    args = parser.parse_args()
     if len(sys.argv) > 1 and ('firstname' not in user_data or not user_data['firstname']):
-        args = parser.parse_args()
         if args.name:
             parts = args.name.split()
             user_data['firstname'] = parts[0]
@@ -93,9 +94,14 @@ def main():
         pdf_path = latex_path.with_suffix('.pdf')
         print(f"📄 PDF erfolgreich erstellt: {pdf_path}")
         
-        # Drucken simulieren
-        print("🖨️  Datei drucken ...")
-        return True
+        # Drucken nur, wenn --no_print nicht gesetzt ist
+        if not args.no_print:
+            print("🖨️  Datei drucken ...")
+            print_file(pdf_path)
+        else:
+            print("🚫 Drucken übersprungen.")
+        
+        return pdf_path
     except Exception as e:
         print(f"🚨 Fehler beim Kompilieren von LaTeX zu PDF: {e}")
         return False

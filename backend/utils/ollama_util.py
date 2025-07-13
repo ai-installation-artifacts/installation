@@ -5,7 +5,7 @@ def call_ollama(prompt: str, model: str = "llama3.2", url: str = "http://localho
     try:
         resp = requests.post(
             url,
-            json={"model": model, "prompt": prompt, "stream": False, "temperature": 0.8, "seed": -1}
+            json={"model": model, "prompt": prompt, "stream": False, "temperature": 0.0, "seed": -1}
         )
         resp.raise_for_status()
         data = resp.json()

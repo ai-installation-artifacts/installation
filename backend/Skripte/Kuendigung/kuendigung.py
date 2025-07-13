@@ -61,23 +61,17 @@ def main():
     # 2. Ollama API aufrufen
     print("💬 Generiere Kündigungstext und erfinde Details ...")
     
-    # Versuche verschiedene Modelle, falls eines nicht funktioniert
-    models_to_try = ["llama3.2", "llama3", "llama2", "mistral"]
-    generated_text_from_ollama = None
+    # Verwende ausschließlich llama3.2
+    model = "llama3.2"
+    print(f"Verwende Modell: {model}...")
+    generated_text_from_ollama = call_ollama(prompt, model=model)
     
-    for model in models_to_try:
-        print(f"Versuche Modell: {model}...")
-        generated_text_from_ollama = call_ollama(prompt, model=model)
-        if generated_text_from_ollama and "kann nicht" not in generated_text_from_ollama.lower() and "cannot" not in generated_text_from_ollama.lower():
-            print(f"✅ Erfolgreich mit Modell: {model}")
-            break
-        else:
-            print(f"❌ Modell {model} hat verweigert oder keine Antwort geliefert.")
-    
-    if not generated_text_from_ollama:
-        print("Fehler: Konnte keinen Text von Ollama erhalten.")
+    if not generated_text_from_ollama or "kann nicht" in generated_text_from_ollama.lower() or "cannot" in generated_text_from_ollama.lower():
+        print(f"❌ Fehler: Konnte keinen Text vom Modell {model} erhalten.")
         return
-        
+    
+    print(f"✅ Erfolgreich mit Modell: {model}")
+    
     # Debug: Zeige die vollständige Antwort von Ollama
     print("\n--- Debug: Vollständige Antwort von Ollama ---")
     print(generated_text_from_ollama)
@@ -157,8 +151,11 @@ def main():
         # 10. Drucken (optional)
         if not args.no_print:
             print_file(compiled_pdf_path) # Korrigierter Funktionsaufruf
+            print("🖨️ Datei wird gedruckt...")
         else:
             print("🚫 Drucken übersprungen.")
+        
+        return compiled_pdf_path
     except RuntimeError as e:
         print(f"Fehler beim Kompilieren von LaTeX zu PDF für {saved_tex_path}: {e}")
     except FileNotFoundError as e: # Falls z.B. pdflatex nicht gefunden wird

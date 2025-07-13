@@ -105,6 +105,12 @@ if __name__ == "__main__":
     else:
         pdf_path = main()
 
+    # Prüfen, ob die --no_print Option gesetzt ist
+    no_print = "--no_print" in sys.argv
+    
     if pdf_path:
-        print("🖨️  Datei drucken ...")
-        print_file(str(pdf_path))
+        if not no_print:
+            print("🖨️  Datei drucken ...")
+            print_file(str(pdf_path))
+        else:
+            print("🚫 Drucken übersprungen.")

@@ -79,7 +79,6 @@ def main(name: str, birthdate: str, compile_pdf_flag: bool = True):
             template_dir = TEMPLATE_PATH.parent
             result_pdf = compile_pdf(tex_file, template_dir, LOGO_NAME)
             print(f"📄 PDF erfolgreich erstellt: {result_pdf}")
-            print_file(result_pdf)
             return result_pdf
         except (FileNotFoundError, subprocess.CalledProcessError, IOError) as e:
             print(f"⚠️ Fehler bei der PDF-Erstellung: {e}")
@@ -91,8 +90,14 @@ if __name__ == "__main__":
         user_name = input("Name: ").strip()
         user_birthdate = input("Geburtsdatum: ").strip()
     
+    # Prüfen, ob die --no_print Option gesetzt ist
+    no_print = "--no_print" in sys.argv
+    
     pdf_path = main(user_name, user_birthdate)
 
     if pdf_path:
-        print("🖨️  Datei drucken ...")
-        print_file(pdf_path)
+        if not no_print:
+            print("🖨️  Datei drucken ...")
+            print_file(pdf_path)
+        else:
+            print("🚫 Drucken übersprungen.")
