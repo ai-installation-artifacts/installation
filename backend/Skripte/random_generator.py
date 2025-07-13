@@ -127,6 +127,67 @@ def run_script_in_subprocess(script_path, user_data, script_type=None):
         print(f"Fehler beim Ausführen des Skripts: {e}")
         return False, None
 
+def delete_output_files(user_name=None):
+    """
+    Löscht Dateien im Output-Ordner, die mit dem angegebenen Benutzernamen beginnen.
+    Wenn kein Benutzername angegeben ist, werden alle Dateien gelöscht.
+    
+    Args:
+        user_name (str, optional): Name des Benutzers, dessen Dateien gelöscht werden sollen.
+        
+    Returns:
+        int: Anzahl der gelöschten Dateien
+    """
+    # Bestimme den Pfad zum Output-Ordner
+    output_dir = project_root / "out"
+    
+    print(f"DEBUG: Output-Verzeichnis: {output_dir}")
+    print(f"DEBUG: Output-Verzeichnis existiert: {os.path.exists(output_dir)}")
+    print(f"DEBUG: Benutzername für Löschung: {user_name}")
+    
+    if not os.path.exists(output_dir):
+        print(f"Output-Ordner existiert nicht: {output_dir}")
+        return 0
+    
+    # Liste alle Dateien im Output-Verzeichnis auf
+    print(f"DEBUG: Dateien im Output-Verzeichnis:")
+    for item in os.listdir(output_dir):
+        item_path = os.path.join(output_dir, item)
+        is_file = os.path.isfile(item_path)
+        print(f"DEBUG:   - {item} (Datei: {is_file})")
+    
+    files_deleted = 0
+    
+    # Lösche Dateien im Output-Ordner
+    for filename in os.listdir(output_dir):
+        file_path = os.path.join(output_dir, filename)
+        
+        # Überspringe Verzeichnisse
+        if not os.path.isfile(file_path):
+            print(f"DEBUG: Überspringe Verzeichnis: {filename}")
+            continue
+        
+        # Wenn ein Benutzername angegeben ist, lösche nur die Dateien dieses Benutzers
+        if user_name:
+            # Ersetze Leerzeichen durch Unterstriche für den Dateinamenvergleich
+            formatted_name = user_name.replace(' ', '_')
+            if not filename.startswith(formatted_name):
+                print(f"DEBUG: Überspringe Datei (gehört nicht zum Benutzer): {filename}")
+                continue
+            else:
+                print(f"DEBUG: Datei gehört zum Benutzer {user_name}: {filename}")
+        
+        try:
+            print(f"DEBUG: Versuche Datei zu löschen: {file_path}")
+            os.remove(file_path)
+            print(f"Datei gelöscht: {file_path}")
+            files_deleted += 1
+        except Exception as e:
+            print(f"Fehler beim Löschen der Datei {file_path}: {e}")
+    
+    print(f"Insgesamt {files_deleted} Dateien im Output-Ordner gelöscht.")
+    return files_deleted
+
 def run_kuendigung(user_data):
     """Führt das Kündigungsskript aus."""
     print("\n=== Generiere Kündigungsschreiben ===")
@@ -218,6 +279,15 @@ def main():
                 print(f"Drucke: {pdf_path}")
                 print_file(pdf_path)
             print("✅ Druckaufträge abgeschlossen.")
+            
+            # 6. Dateien nach dem Drucken löschen
+            print("\n🗑️ Lösche generierte Dateien nach dem Drucken...")
+            user_name = user_data.get('full_name')
+            if user_name:
+                deleted_count = delete_output_files(user_name)
+                print(f"✅ {deleted_count} Dateien wurden nach dem Drucken gelöscht.")
+            else:
+                print("⚠️ Kein Benutzername gefunden, Dateien konnten nicht gelöscht werden.")
         
     except Exception as e:
         print(f"Fehler bei der Ausführung: {e}")
