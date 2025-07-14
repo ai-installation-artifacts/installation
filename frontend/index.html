@@ -2,7 +2,9 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Kunst-KI Installation</title>
   <link rel="stylesheet" href="styles/style.css" />
 </head>
@@ -20,7 +22,7 @@
 
   <div id="page2" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="deleteUserData()">X</div>
+    <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
       <h1>NAME</h1>
       <p>Wie heißt du?</p>
@@ -38,18 +40,18 @@
 
   <div id="page3" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="deleteUserData()">X</div>
+    <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
       <h1>GEBURTSDATUM</h1>
       <p>Wähle dein Geburtsdatum aus:</p>
-      <input type="date" id="birthdate" />
+      <input type="date" id="birthdate" placeholder="Bitte Auswählen" />
       <button class="next-button" onclick="goToPage(4)">WEITER</button>
     </div>
   </div>
 
   <div id="page4" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="deleteUserData()">X</div>
+    <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
       <h1>UNTERSCHRIFT</h1>
       <p>Unterschreibe mit dem Finger:</p>
@@ -73,7 +75,7 @@
 
   <div id="page6" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="deleteUserData()">X</div>
+    <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
       <h1>FAST GESCHAFFT!</h1>
       <p>Dein Gedicht ist bereit und wird gedruckt. Sieh dir die Dokumente in Ruhe an und komm zurück.</p>
@@ -83,7 +85,7 @@
 
   <div id="page7" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="deleteUserData()">X</div>
+    <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
       <h1>DATEN LÖSCHEN</h1>
       <p>Wenn du deine Daten löschen willst, klicke hier.</p>
@@ -93,7 +95,7 @@
 
   <div id="page8" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="deleteUserData()">X</div>
+    <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
       <h1>DANKE FÜR DEINE TEILNAHME!</h1>
       <p>Schön, dass du mitgemacht hast!</p>

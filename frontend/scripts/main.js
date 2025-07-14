@@ -322,8 +322,62 @@ function saveUserData(userData, signaturePng) {
   }
 }
 
-// Funktion zum Löschen der Benutzerdaten
+// Funktion zum Löschen der Benutzerdaten und Weiterleitung zur Danke-Seite
 function deleteUserData() {
+  try {
+    // Formularfelder zurücksetzen
+    document.getElementById('firstname').value = '';
+    document.getElementById('lastname').value = '';
+    if (document.getElementById('birthdate')) {
+      document.getElementById('birthdate').value = '';
+    }
+    
+    // Unterschrift zurücksetzen
+    clearSignatureCanvas();
+    
+    // Unterschriftsstatus zurücksetzen
+    hasSignature = false;
+    
+    // Lokale Daten löschen
+    localStorage.removeItem('temp_user_data');
+    
+    // Validierungszustände zurücksetzen
+    resetValidationStates();
+    
+    // Server-Anfrage zum Löschen aller Daten im data-Ordner
+    fetch('/delete-user-data', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Server-Antwort:', data);
+      if (data.status === 'success') {
+        console.log('Alle Daten wurden erfolgreich vom Server gelöscht');
+        // Zur Danke-Seite weiterleiten
+        goToPage(8);
+      } else {
+        throw new Error(data.message || 'Unbekannter Serverfehler');
+      }
+    })
+    .catch(error => {
+      console.error('Fehler beim Löschen der Daten vom Server:', error);
+      alert('Die Daten konnten nicht gelöscht werden. Bitte versuchen Sie es später erneut.');
+      // Trotz Fehler zur Danke-Seite weiterleiten
+      goToPage(8);
+    });
+  } catch (error) {
+    console.error('Fehler beim Löschen der Daten:', error);
+    alert('Die Daten konnten nicht gelöscht werden. Bitte versuchen Sie es später erneut.');
+    // Trotz Fehler zur Danke-Seite weiterleiten
+    goToPage(8);
+  }
+}
+
+// Funktion für X-Buttons: Löscht Daten und leitet zur Startseite weiter
+function exitToHome() {
   try {
     // Formularfelder zurücksetzen
     document.getElementById('firstname').value = '';
