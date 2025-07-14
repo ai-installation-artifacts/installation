@@ -9,7 +9,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: 'Courier New', monospace;
-  filter: blur(0.7px);
+  filter: blur(0.4px);
   color: #E2E2FF;
   background-color: black;
   min-height: 100vh;

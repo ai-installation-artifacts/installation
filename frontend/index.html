@@ -20,10 +20,10 @@
 
   <div id="page2" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="exit-button" onclick="deleteUserData()">X</div>
     <div class="container">
       <h1>NAME</h1>
-      <p>WIE HEIßT DU?</p>
+      <p>Wie heißt du?</p>
       <div class="name-fields-container">
         <div class="name-field">
           <input type="text" id="firstname" name="firstname" placeholder="Vorname" />
@@ -32,26 +32,26 @@
           <input type="text" id="lastname" name="lastname" placeholder="Nachname" />
         </div>
       </div>
-      <button class="next-button" onclick="goToPage(3)">Weiter</button>
+      <button class="next-button" onclick="goToPage(3)">WEITER</button>
     </div>
   </div>
 
   <div id="page3" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="exit-button" onclick="deleteUserData()">X</div>
     <div class="container">
-      <h1>Geburtsdatum</h1>
+      <h1>GEBURTSDATUM</h1>
       <p>Wähle dein Geburtsdatum aus:</p>
       <input type="date" id="birthdate" />
-      <button class="next-button" onclick="goToPage(4)">Weiter</button>
+      <button class="next-button" onclick="goToPage(4)">WEITER</button>
     </div>
   </div>
 
   <div id="page4" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="exit-button" onclick="deleteUserData()">X</div>
     <div class="container">
-      <h1>Unterschrift</h1>
+      <h1>UNTERSCHRIFT</h1>
       <p>Unterschreibe mit dem Finger:</p>
       <div class="signature-wrapper">
         <button type="button" class="signature-clear-btn" title="Unterschrift löschen" onclick="clearSignatureCanvas()">🗑️</button>
@@ -59,55 +59,54 @@
           <canvas id="signatureCanvas" width="600" height="150"></canvas>
         </div>
       </div>
-      <button class="center-button primary-button" onclick="submitData()">Absenden</button>
+      <button class="center-button primary-button" onclick="submitData()">ABSENDEN</button>
     </div>
   </div>
 
   <div id="page5" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
     <div class="container">
-      <h1>Bitte warten…</h1>
+      <h1>BITTE WARTEN...</h1>
       <p>Deine Eingaben werden verarbeitet.</p>
     </div>
   </div>
 
   <div id="page6" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="exit-button" onclick="deleteUserData()">X</div>
     <div class="container">
-      <h1>Fast geschafft!</h1>
-      <p>Dein Gedicht ist bereit. Lies dir die Info durch und drücke weiter.</p>
-      <button class="next-button" onclick="goToPage(7)">Weiter</button>
+      <h1>FAST GESCHAFFT!</h1>
+      <p>Dein Gedicht ist bereit und wird gedruckt. Sieh dir die Dokumente in Ruhe an und komm zurück.</p>
+      <button class="next-button" onclick="goToPage(7)">WEITER</button>
     </div>
   </div>
 
   <div id="page7" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="exit-button" onclick="deleteUserData()">X</div>
     <div class="container">
-      <h1>Daten löschen</h1>
+      <h1>DATEN LÖSCHEN</h1>
       <p>Wenn du deine Daten löschen willst, klicke hier.</p>
-      <button class="center-button primary-butto" id="delete-button" onclick="deleteUserData()">Meine Daten löschen</button>
+      <button class="center-button primary-butto" id="delete-button" onclick="deleteUserData()">MEINE DATEN LÖSCHEN</button>
     </div>
   </div>
 
   <div id="page8" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
-    <div class="exit-button" onclick="resetAndGoHome()">X</div>
+    <div class="exit-button" onclick="deleteUserData()">X</div>
     <div class="container">
-      <h1>Danke für deine Teilnahme</h1>
+      <h1>DANKE FÜR DEINE TEILNAHME!</h1>
       <p>Schön, dass du mitgemacht hast!</p>
-      <button class="next-button" onclick="goToPage(9)">Weiter</button>
+      <button class="next-button" onclick="goToPage(9)">WEITER</button>
     </div>
   </div>
 
   <div id="page9" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="container">
-      <h1>Zurück zum Start</h1>
+      <h1>ZURÜCK ZUM START</h1>
       <img src="assets/images/QR-Code.png" alt="Finales Bild" />
-      <button class="center-button primary-button" onclick="goToPage(1)">Zurück zum Start</button>
+      <button class="center-button primary-button" onclick="resetAndGoToStart()">ZURÜCK ZUM START</button>
     </div>
   </div>
 
