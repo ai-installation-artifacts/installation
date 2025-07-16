@@ -273,7 +273,7 @@ function submitData() {
   // Simuliere Ladezeit (10 Sekunden) und gehe dann zur nächsten Seite
   setTimeout(() => {
     goToPage(6);
-  }, 15000);
+  }, 33000);
 }
 
 // Funktion zum Speichern der Benutzerdaten als JSON
