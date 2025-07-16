@@ -5,8 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Kunst-KI Installation</title>
   <link rel="stylesheet" href="styles/style.css" />
+  <!-- iOS-spezifische Anpassungen -->
+  <script type="text/javascript">
+    // Verhindert das Scrollen auf iOS-Geräten, aber erlaubt Tastatureingaben
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+      }
+    }, { passive: false });
+    
+    // Spezielle Behandlung für iOS-Eingabefelder
+    document.addEventListener('DOMContentLoaded', function() {
+      // Erkennen, ob es sich um ein iOS-Gerät handelt
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      
+      if (isIOS) {
+        const inputFields = document.querySelectorAll('input[type="text"], input[type="date"]');
+        inputFields.forEach(function(input) {
+          // Fokus explizit setzen beim Tippen
+          input.addEventListener('touchstart', function(e) {
+            // Nicht preventDefault aufrufen, damit die Tastatur erscheint
+            setTimeout(() => {
+              this.focus();
+            }, 0);
+          });
+        });
+      }
+    });
+  </script>
 </head>
 <body>
 

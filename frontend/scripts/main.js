@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Validierung für Pflichtfelder einrichten
   setupValidation();
+  
+  // iOS-spezifische Anpassungen für Eingabefelder
+  fixIOSInputs();
 });
 
 // Funktion zum Wechseln zwischen Seiten
@@ -453,6 +456,64 @@ function setupValidation() {
   if (canvas) {
     // Validiere die Seite sofort, um den Button zu deaktivieren
     validatePage(4);
+  }
+}
+
+// Funktion zur Behebung von iOS-Eingabeproblemen
+function fixIOSInputs() {
+  // Erkennen, ob es sich um ein iOS-Gerät handelt
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  
+  if (isIOS) {
+    console.log('iOS-Gerät erkannt, wende Eingabefeld-Fixes an');
+    
+    // Alle Textfelder und Datumsfelder auswählen
+    const inputFields = document.querySelectorAll('input[type="text"], input[type="date"]');
+    
+    // Verhindere Scrollen auf der gesamten Seite
+    document.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+    
+    // Spezielle Behandlung für Eingabefelder
+    inputFields.forEach(input => {
+      // Spezielle Behandlung für iOS-Eingabefelder
+      input.setAttribute('autocomplete', 'off');
+      input.setAttribute('autocorrect', 'off');
+      input.setAttribute('autocapitalize', 'off');
+      input.setAttribute('spellcheck', 'false');
+      
+      // Fokus explizit setzen beim Tippen
+      input.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        this.focus();
+        this.click();
+      });
+      
+      // Verhindern, dass der Fokus beim Scrollen verloren geht
+      input.addEventListener('focus', function() {
+        // Scrolle zu diesem Element (nur für dieses Element)
+        const rect = this.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        window.scrollTo({
+          top: rect.top + scrollTop - 100,
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    // Spezielle Behandlung für das Datumsfeld
+    const dateInput = document.getElementById('birthdate');
+    if (dateInput) {
+      dateInput.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        // Verzögerung, um iOS Zeit zu geben
+        setTimeout(() => {
+          this.focus();
+          this.click();
+        }, 100);
+      });
+    }
   }
 }
 
