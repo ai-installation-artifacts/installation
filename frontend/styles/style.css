@@ -9,7 +9,6 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: 'Courier New', monospace;
-  filter: blur(0.4px);
   color: #E2E2FF;
   background-color: black;
   min-height: 100vh;
@@ -330,6 +329,14 @@ button.next-button:not([data-center]) {
 #delete-button {
   background-color: red;
   border: none;
+}
+
+#page9 img {
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
 }
 
 /*# sourceMappingURL=style.css.map */

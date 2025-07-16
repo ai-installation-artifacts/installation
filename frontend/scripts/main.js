@@ -161,7 +161,7 @@ function initializeSignatureCanvas() {
   ctx.lineWidth = 2;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = '#0000FF'; // Blaue Farbe für die Unterschrift
+  ctx.strokeStyle = '#000000'; // Blaue Farbe für die Unterschrift
   
   // Event-Listener für Maus
   canvas.addEventListener('mousedown', (e) => {
@@ -270,7 +270,7 @@ function submitData() {
   // Simuliere Ladezeit (10 Sekunden) und gehe dann zur nächsten Seite
   setTimeout(() => {
     goToPage(6);
-  }, 10000);
+  }, 15000);
 }
 
 // Funktion zum Speichern der Benutzerdaten als JSON
