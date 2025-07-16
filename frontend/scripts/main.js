@@ -161,10 +161,10 @@ function initializeSignatureCanvas() {
   let lastY = 0;
   
   // Stift-Einstellungen
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 6; // Dickere Linie für bessere Sichtbarkeit
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = '#000000'; // Blaue Farbe für die Unterschrift
+  ctx.strokeStyle = '#000000'; // Schwarze Farbe für die Unterschrift
   
   // Event-Listener für Maus
   canvas.addEventListener('mousedown', (e) => {
