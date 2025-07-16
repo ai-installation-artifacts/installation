@@ -14,8 +14,12 @@
   <div id="page1" class="page active">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="container">
-      <h1>WILLKOMMEN ZU ARTIFACTS</h1>
-      <p>Erstelle ein personalisiertes Gedicht, das mehr ist als nur ein Text.</p>
+      <p>Nur ein Name, nur ein Tag
+        und wir zeigen dir, was niemand vermag.
+        Ein Text für dich, persönlich fein,
+        geschrieben von Maschine,
+        aber fast wie dein.</p>
+      <h1>LASS DIR DEIN PERSÖNLICHES GEDICHT SCHREIBEN.</h1>
       <button class="center-button primary-button" onclick="goToPage(2)">START</button>
     </div>
   </div>
@@ -24,8 +28,8 @@
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
-      <h1>NAME</h1>
-      <p>Wie heißt du?</p>
+      <p>Damit wir dein Gedicht personalisieren können, brauchen wir deinen vollen Namen.</p>
+      <h1>WIE HEIßT DU?</h1>
       <div class="name-fields-container">
         <div class="name-field">
           <input type="text" id="firstname" name="firstname" placeholder="Vorname" />
@@ -42,8 +46,8 @@
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
-      <h1>GEBURTSDATUM</h1>
-      <p>Wähle dein Geburtsdatum aus:</p>
+      <p>Kannst du uns auch bitte dein Alter verraten, damit wir ein passendes Gedicht verfassen können.</p>
+      <h1>WANN BIST DU GEBOREN?</h1>
       <input type="date" id="birthdate" placeholder="Bitte Auswählen" />
       <button class="next-button" onclick="goToPage(4)">WEITER</button>
     </div>
@@ -53,8 +57,8 @@
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
-      <h1>UNTERSCHRIFT</h1>
-      <p>Unterschreibe mit dem Finger:</p>
+      <p>Und zuguterletzt deine persönliche Unterschrift, damit wir dich darauf verewigen können!</p>
+      <h1>BITTE UNTERSCHREIBE DRUNTER:</h1>
       <div class="signature-wrapper">
         <button type="button" class="signature-clear-btn" title="Unterschrift löschen" onclick="clearSignatureCanvas()">🗑️</button>
         <div class="signature-container">
@@ -68,8 +72,8 @@
   <div id="page5" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="container">
-      <h1>BITTE WARTEN...</h1>
       <p>Deine Eingaben werden verarbeitet.</p>
+      <h1>BITTE WARTEN...</h1>
     </div>
   </div>
 
@@ -77,8 +81,8 @@
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
-      <h1>FAST GESCHAFFT!</h1>
-      <p>Dein Gedicht ist bereit und wird gedruckt. Sieh dir die Dokumente in Ruhe an und komm zurück.</p>
+      <h1>DEINE ARTIFACTS WURDEN GEDRUCKT!</h1>
+      <p>Schau sie dir an und komm wieder!</p>
       <button class="next-button" onclick="goToPage(7)">WEITER</button>
     </div>
   </div>
@@ -87,8 +91,8 @@
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
-      <h1>DATEN LÖSCHEN</h1>
-      <p>Wenn du deine Daten löschen willst, klicke hier.</p>
+      <h1>HAST DU WIRKLICH GEGLAUBT WIR WÜRDEN DEINE DATEN NICHT WEITERVERWENDEN?</h1>
+      <p>Trotzdem geben wir dir hier die Möglichkeit deine Daten aus unseren Systeme Digital zu löschen.</p>
       <button class="center-button primary-butto" id="delete-button" onclick="deleteUserData()">MEINE DATEN LÖSCHEN</button>
     </div>
   </div>
@@ -97,8 +101,9 @@
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="exit-button" onclick="exitToHome()">X</div>
     <div class="container">
-      <h1>DANKE FÜR DEINE TEILNAHME!</h1>
-      <p>Schön, dass du mitgemacht hast!</p>
+      <h1>DATEN GELÖSCHT.</h1>
+      <p>Deine digitalen Daten wurden gelöscht.
+        Doch was auf Papier gedruckt wurde, bleibt. Du kannst die Artefakte mit dem Schredder vernichten... oder behalten.</p>
       <button class="next-button" onclick="goToPage(9)">WEITER</button>
     </div>
   </div>
@@ -106,7 +111,8 @@
   <div id="page9" class="page">
     <img src="assets/Logo.svg" class="logo" alt="Logo" />
     <div class="container">
-      <h1>ZURÜCK ZUM START</h1>
+      <p>Für weitere Infos Scanne bitte den QR-Code.</p>
+      <h1>VIELEN DANK FÜR DEINE TEILNAHME!</h1>
       <img src="assets/images/QR-Code.png" alt="Finales Bild" />
       <button class="center-button primary-button" onclick="resetAndGoToStart()">ZURÜCK ZUM START</button>
     </div>
