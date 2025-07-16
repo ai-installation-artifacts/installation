@@ -270,10 +270,85 @@ function submitData() {
   // Zur Ladeseite wechseln
   goToPage(5);
   
-  // Simuliere Ladezeit (10 Sekunden) und gehe dann zur nächsten Seite
-  setTimeout(() => {
-    goToPage(6);
-  }, 33000);
+  // Starte die Abfrage des Druckstatus
+  startPrintStatusPolling();
+}
+
+// Funktion zum Abfragen des Druckstatus
+function startPrintStatusPolling() {
+  console.log('Starte Abfrage des Druckstatus...');
+  
+  // Status-Polling-Intervall (alle 2 Sekunden)
+  const statusInterval = setInterval(() => {
+    fetch('/print-status')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Druckstatus:', data);
+        
+        // Status anzeigen
+        const statusElement = document.getElementById('print-status-message');
+        if (statusElement) {
+          statusElement.textContent = data.message || 'Dokumente werden verarbeitet...';
+        }
+        
+        // Bei "generating" Status anzeigen
+        if (data.status === 'generating') {
+          console.log('Druckvorgang läuft...');
+          if (statusElement) {
+            statusElement.textContent = 'Dokumente werden generiert und gedruckt...';
+          }
+        }
+        
+        // Bei "printing" Status anzeigen
+        if (data.status === 'printing') {
+          console.log('Dokumente werden gedruckt...');
+          if (statusElement) {
+            statusElement.textContent = 'Dokumente werden gedruckt...';
+          }
+        }
+        
+        // Bei Abschluss zur Erfolgsseite wechseln
+        if (data.status === 'completed') {
+          clearInterval(statusInterval);
+          console.log('Druckvorgang abgeschlossen!');
+          goToPage(6);
+          showNotification('Druckvorgang abgeschlossen', 'Ihre Dokumente wurden erfolgreich gedruckt.');
+        }
+        
+        // Bei Fehler auch zur Erfolgsseite wechseln, aber mit Fehlermeldung
+        if (data.status === 'error') {
+          clearInterval(statusInterval);
+          console.error('Fehler beim Drucken:', data.message);
+          goToPage(6);
+          showNotification('Fehler beim Drucken', data.message || 'Es ist ein Fehler aufgetreten.');
+          // Fehlermeldung anzeigen
+          const errorElement = document.createElement('div');
+          errorElement.className = 'error-message';
+          errorElement.textContent = 'Es gab ein Problem beim Drucken. Bitte wenden Sie sich an einen Mitarbeiter.';
+          document.getElementById('page6').appendChild(errorElement);
+        }
+      })
+      .catch(error => {
+        console.error('Fehler bei der Statusabfrage:', error);
+      });
+  }, 2000); // Alle 2 Sekunden abfragen
+}
+
+// Funktion zum Anzeigen einer Desktop-Benachrichtigung
+function showNotification(title, message) {
+  // Prüfen, ob Browser-Benachrichtigungen unterstützt werden
+  if ('Notification' in window) {
+    // Berechtigung prüfen/anfordern
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body: message });
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification(title, { body: message });
+        }
+      });
+    }
+  }
 }
 
 // Funktion zum Speichern der Benutzerdaten als JSON
@@ -308,7 +383,6 @@ function saveUserData(userData, signaturePng) {
     })
     .catch(error => {
       console.error('Fehler bei der Serveranfrage:', error);
-      alert('Die Daten konnten nicht zum Server gesendet werden.');
     });
     
     console.log('Daten erfolgreich im localStorage gespeichert und zum Server gesendet');
@@ -320,7 +394,6 @@ function saveUserData(userData, signaturePng) {
     return true;
   } catch (error) {
     console.error('Fehler beim Speichern der Daten:', error);
-    alert('Die Daten konnten nicht gespeichert werden. Bitte versuchen Sie es später erneut.');
     return false;
   }
 }
@@ -367,13 +440,11 @@ function deleteUserData() {
     })
     .catch(error => {
       console.error('Fehler beim Löschen der Daten vom Server:', error);
-      alert('Die Daten konnten nicht gelöscht werden. Bitte versuchen Sie es später erneut.');
       // Trotz Fehler zur Danke-Seite weiterleiten
       goToPage(8);
     });
   } catch (error) {
     console.error('Fehler beim Löschen der Daten:', error);
-    alert('Die Daten konnten nicht gelöscht werden. Bitte versuchen Sie es später erneut.');
     // Trotz Fehler zur Danke-Seite weiterleiten
     goToPage(8);
   }
@@ -421,13 +492,11 @@ function exitToHome() {
     })
     .catch(error => {
       console.error('Fehler beim Löschen der Daten vom Server:', error);
-      alert('Die Daten konnten nicht gelöscht werden. Bitte versuchen Sie es später erneut.');
       // Trotz Fehler zur Startseite zurückkehren
       goToPage(1);
     });
   } catch (error) {
     console.error('Fehler beim Löschen der Daten:', error);
-    alert('Die Daten konnten nicht gelöscht werden. Bitte versuchen Sie es später erneut.');
     // Trotz Fehler zur Startseite zurückkehren
     goToPage(1);
   }
