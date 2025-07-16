@@ -340,11 +340,18 @@ button.next-button:not([data-center]) {
 }
 
 #page9 img {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 300px;
+  max-height: 300px;
   width: auto;
   height: auto;
   margin: 0 auto;
+}
+
+/* Spezifische Positionierung für das Logo auf der letzten Seite */
+#page9 .logo {
+  top: 3rem; 
+  max-width: 150px;
+  /* Weiter nach unten verschieben */
 }
 
 /*# sourceMappingURL=style.css.map */
