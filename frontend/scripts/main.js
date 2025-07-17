@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // iOS-spezifische Anpassungen für Eingabefelder
   fixIOSInputs();
+  
+  // Idle-Modus initialisieren und sofort anzeigen (für Testing)
+  initIdleMode(true);
 });
 
 // Funktion zum Wechseln zwischen Seiten
@@ -79,7 +82,7 @@ function resetAndGoToStart() {
   // Unterschriftsstatus zurücksetzen
   hasSignature = false;
   
-  // Lokalen Speicher leeren
+  // Lokale Daten löschen
   localStorage.removeItem('temp_user_data');
   
   // Validierungszustände zurücksetzen
@@ -615,4 +618,206 @@ function validatePage(pageNumber) {
   if (nextButton) {
     nextButton.disabled = !isValid;
   }
+}
+
+/**
+ * Idle Mode für die Kunst-KI Installation
+ * Aktiviert einen Idle-Modus nach 15 Minuten Inaktivität
+ * und kehrt mit einem Klick zum ersten Screen zurück
+ */
+
+// Konfiguration
+const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 Minuten in Millisekunden
+let idleTimer = null;
+let isIdle = false;
+
+// DOM-Elemente
+let idleScreen = null;
+
+/**
+ * Initialisierung des Idle-Modus
+ * @param {boolean} showImmediately - Wenn true, wird der Idle-Modus sofort angezeigt
+ */
+function initIdleMode(showImmediately = true) {
+  console.log('Initialisiere Idle-Modus...');
+  
+  // Idle-Screen erstellen
+  createIdleScreen();
+  
+  // Event-Listener für Benutzeraktivität
+  setupActivityListeners();
+  
+  // Timer starten
+  resetIdleTimer();
+  
+  // Optional: Idle-Modus sofort anzeigen (für Testing)
+  if (showImmediately) {
+    console.log('Zeige Idle-Modus sofort an (Test-Modus)');
+    setTimeout(enterIdleMode, 100); // Kurze Verzögerung, damit DOM vollständig geladen ist
+  }
+  
+  console.log('Idle-Modus initialisiert. Timeout:', IDLE_TIMEOUT, 'ms');
+}
+
+/**
+ * Erstellt den Idle-Screen als DOM-Element
+ */
+function createIdleScreen() {
+  // Prüfen, ob der Idle-Screen bereits existiert
+  if (document.getElementById('idle-screen')) {
+    idleScreen = document.getElementById('idle-screen');
+    return;
+  }
+  
+  // Idle-Screen erstellen
+  idleScreen = document.createElement('div');
+  idleScreen.id = 'idle-screen';
+  idleScreen.className = 'idle-screen';
+  
+  // Artifacts Wrapper erstellen (ähnlich wie buzz_wrapper)
+  const artifactsWrapper = document.createElement('div');
+  artifactsWrapper.className = 'artifacts_wrapper';
+  
+  // Text-Container erstellen
+  const textDiv = document.createElement('div');
+  textDiv.className = 'text';
+  
+  // Text "ARTIFACTS" hinzufügen
+  const span = document.createElement('span');
+  span.textContent = "ARTIFACTS";
+  textDiv.appendChild(span);
+  
+  // Scanline hinzufügen
+  const scanline = document.createElement('div');
+  scanline.className = 'scanline';
+  
+  // Hinweistext hinzufügen
+  const hintText = document.createElement('div');
+  hintText.className = 'hint-text';
+  hintText.textContent = "Bildschirm berühren um fortzufahren";
+  
+  // Elemente zusammenfügen
+  artifactsWrapper.appendChild(textDiv);
+  artifactsWrapper.appendChild(scanline);
+  artifactsWrapper.appendChild(hintText);
+  idleScreen.appendChild(artifactsWrapper);
+  
+  // Event-Listener zum Verlassen des Idle-Modus
+  idleScreen.addEventListener('click', exitIdleMode);
+  idleScreen.addEventListener('touchstart', exitIdleMode);
+  
+  // Zum Body hinzufügen
+  document.body.appendChild(idleScreen);
+  
+  // Zusätzliche Spans für den Glitch-Effekt hinzufügen
+  for (let i = 0; i < 4; i++) {
+    const clonedSpan = span.cloneNode(true);
+    textDiv.insertBefore(clonedSpan, textDiv.firstChild);
+  }
+  
+  // Zusätzliche Scanlines hinzufügen
+  for (let i = 0; i < 10; i++) {
+    const clonedScanline = scanline.cloneNode(true);
+    artifactsWrapper.appendChild(clonedScanline);
+  }
+}
+
+/**
+ * Setzt den Idle-Timer zurück
+ */
+function resetIdleTimer() {
+  // Bestehenden Timer löschen
+  if (idleTimer) {
+    clearTimeout(idleTimer);
+  }
+  
+  // Neuen Timer starten
+  idleTimer = setTimeout(enterIdleMode, IDLE_TIMEOUT);
+}
+
+/**
+ * Aktiviert den Idle-Modus
+ */
+function enterIdleMode() {
+  if (isIdle) return; // Bereits im Idle-Modus
+  
+  console.log('Aktiviere Idle-Modus');
+  isIdle = true;
+  
+  // Idle-Screen anzeigen
+  idleScreen.style.display = 'flex';
+  
+  // Optional: Speichern des aktuellen Zustands
+  saveCurrentState();
+}
+
+/**
+ * Verlässt den Idle-Modus und kehrt zum ersten Screen zurück
+ */
+function exitIdleMode(event) {
+  if (!isIdle) return; // Nicht im Idle-Modus
+  
+  console.log('Verlasse Idle-Modus');
+  isIdle = false;
+  
+  // Idle-Screen ausblenden
+  idleScreen.style.display = 'none';
+  
+  // Zum ersten Screen zurückkehren
+  if (typeof resetAndGoToStart === 'function') {
+    resetAndGoToStart();
+  } else if (typeof resetAndGoHome === 'function') {
+    resetAndGoHome();
+  } else if (typeof goToPage === 'function') {
+    goToPage(1);
+  }
+  
+  // Timer zurücksetzen
+  resetIdleTimer();
+  
+  // Verhindern, dass das Event weitergeleitet wird
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}
+
+/**
+ * Speichert den aktuellen Zustand der Anwendung
+ * (optional, falls später benötigt)
+ */
+function saveCurrentState() {
+  // Hier könnte der aktuelle Zustand gespeichert werden,
+  // falls später eine Wiederherstellung gewünscht ist
+}
+
+/**
+ * Richtet Event-Listener für Benutzeraktivität ein
+ */
+function setupActivityListeners() {
+  // Liste der Events, die als Benutzeraktivität gelten
+  const activityEvents = [
+    'mousedown', 'mousemove', 'keydown',
+    'touchstart', 'touchmove', 'touchend',
+    'click', 'scroll', 'focus'
+  ];
+  
+  // Event-Listener für jedes Event hinzufügen
+  activityEvents.forEach(eventType => {
+    document.addEventListener(eventType, handleUserActivity, { passive: true });
+  });
+}
+
+/**
+ * Behandelt Benutzeraktivität
+ */
+function handleUserActivity() {
+  // Wenn im Idle-Modus, diesen verlassen
+  if (isIdle) {
+    exitIdleMode();
+    return;
+  }
+  
+  // Ansonsten nur den Timer zurücksetzen
+  resetIdleTimer();
 }
