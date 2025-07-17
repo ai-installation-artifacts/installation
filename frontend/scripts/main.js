@@ -651,7 +651,7 @@ function validatePage(pageNumber) {
  */
 
 // Konfiguration
-const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 Minuten in Millisekunden
+const IDLE_TIMEOUT = 3 * 60 * 1000; // 3 Minuten in Millisekunden
 let idleTimer = null;
 let isIdle = false;
 
