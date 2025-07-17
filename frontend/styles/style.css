@@ -349,9 +349,9 @@ button.next-button:not([data-center]) {
 
 /* Spezifische Positionierung für das Logo auf der letzten Seite */
 #page9 .logo {
-  top: 3rem; 
+  top: 1rem; /* Gleiche Position wie bei anderen Seiten */
   max-width: 150px;
-  /* Weiter nach unten verschieben */
+  margin-top: 24px;
 }
 
 /* Idle Screen Grundstil */
