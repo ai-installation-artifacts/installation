@@ -283,10 +283,22 @@ function startPrintStatusPolling() {
   
   // Status-Polling-Intervall (alle 2 Sekunden)
   const statusInterval = setInterval(() => {
-    fetch('/print-status')
-      .then(response => response.json())
+    console.log('Polling Druckstatus...');
+    fetch('/print-status', {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+      })
       .then(data => {
-        console.log('Druckstatus:', data);
+        console.log('Druckstatus erhalten:', data);
         
         // Status anzeigen
         const statusElement = document.getElementById('print-status-message');
@@ -335,6 +347,18 @@ function startPrintStatusPolling() {
         console.error('Fehler bei der Statusabfrage:', error);
       });
   }, 2000); // Alle 2 Sekunden abfragen
+  
+  // Sicherheitsmaßnahme: Nach 60 Sekunden automatisch zur Seite 6 wechseln, falls kein Status empfangen wurde
+  setTimeout(() => {
+    console.log('Timeout für Druckstatus-Polling erreicht');
+    clearInterval(statusInterval);
+    // Nur wechseln, wenn wir noch auf Seite 5 sind
+    const currentPage = document.querySelector('.page.active');
+    if (currentPage && currentPage.id === 'page5') {
+      console.log('Wechsle automatisch zu Seite 6 nach Timeout');
+      goToPage(6);
+    }
+  }, 60000);
 }
 
 // Funktion zum Anzeigen einer Desktop-Benachrichtigung
