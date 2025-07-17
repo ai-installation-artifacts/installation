@@ -691,7 +691,7 @@ function createIdleScreen() {
   const scanline = document.createElement('div');
   scanline.className = 'scanline';
   
-  // Hinweistext hinzufügen
+  // Hinweistext hinzufügen - jetzt direkt im idle-screen, nicht im artifacts_wrapper
   const hintText = document.createElement('div');
   hintText.className = 'hint-text';
   hintText.textContent = "Bildschirm berühren um fortzufahren";
@@ -699,8 +699,8 @@ function createIdleScreen() {
   // Elemente zusammenfügen
   artifactsWrapper.appendChild(textDiv);
   artifactsWrapper.appendChild(scanline);
-  artifactsWrapper.appendChild(hintText);
   idleScreen.appendChild(artifactsWrapper);
+  idleScreen.appendChild(hintText); // Hinweistext direkt zum idle-screen hinzufügen
   
   // Event-Listener zum Verlassen des Idle-Modus
   idleScreen.addEventListener('click', exitIdleMode);

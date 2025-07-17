@@ -354,12 +354,6 @@ button.next-button:not([data-center]) {
   /* Weiter nach unten verschieben */
 }
 
-/*# sourceMappingURL=style.css.map */
-
-/**
- * Idle Mode Styling mit Glitch-Effekt
- */
-
 /* Idle Screen Grundstil */
 .idle-screen {
   position: fixed;
@@ -447,12 +441,12 @@ button.next-button:not([data-center]) {
   -webkit-animation: jerkwhole 5s infinite;
   animation: jerkwhole 5s infinite;
   position: relative;
-  margin-left: 20px; /* Verschiebung nach rechts */
+  margin-left: 24px; /* Verschiebung nach rechts */
 }
 
-.artifacts_wrapper .hint-text {
+.idle-screen .hint-text {
   position: absolute;
-  bottom: 10%;
+  bottom: 20px; /* Fester Abstand vom unteren Rand */
   left: 50%;
   transform: translateX(-50%);
   color: rgba(255, 255, 255, 0.7);
